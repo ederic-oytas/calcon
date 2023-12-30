@@ -1,3 +1,5 @@
+"""Module for the command-line interface."""
+
 from typing import Annotated
 import typer
 
