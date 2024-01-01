@@ -2,5 +2,5 @@
 UNSIGNED: /\d+(?:\.\d*)?|\.\d+'/
 
 ?expr: atom
-?atom: UNSIGNED
+?atom: UNSIGNED      -> unsigned
     | "(" expr ")"

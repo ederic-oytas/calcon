@@ -10,4 +10,6 @@ _expr_parser = lark.Lark.open_from_package(
 
 def parse_expr(text: str, /) -> lark.Tree:
     """Parses the given text as an expression and returns the parse tree."""
-    return _expr_parser.parse(text)
+    parse_result = _expr_parser.parse(text)
+    assert isinstance(parse_result, lark.Tree)
+    return parse_result
