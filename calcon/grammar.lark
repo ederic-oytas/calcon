@@ -1,6 +1,28 @@
 
 UNSIGNED: /\d+(?:\.\d*)?|\.\d+'/
+IDENT: /[a-zA-Z_]+/
 
-?expr: atom
-?atom: UNSIGNED      -> unsigned
+?expr: conv
+
+?conv: sum
+    | conv "->" sum        -> convert
+?sum: prod
+    | sum "+" prod         -> add
+    | sum "-" prod         -> subtract
+?prod: adj
+    | prod "*" adj         -> multiply
+    | prod "/" adj         -> divide
+?adj: sig
+    | adj sig
+?sig: pow
+    | "+" sig              -> positive
+    | "-" sig              -> negate
+?pow: atom
+    | atom ("**"|"^") sig  -> exponentiate
+?atom: UNSIGNED            -> unsigned
+    | IDENT                -> ident
     | "(" expr ")"
+
+%import common.WS
+
+%ignore WS
