@@ -2,7 +2,7 @@
 
 
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 
 @dataclass
@@ -108,6 +108,22 @@ class App:
     #
     # Quantity operations
     #
+    def quantity_from_magnitude_str(self, magnitude_str: str, /) -> Quantity:
+        """Creates a unitless quantity from the given magnitude (represented as
+        a string) and returns the result.
+        """
+        # TODO test
+        ...
+
+    def quantity_from_unit_name(self, unit_name: str, /) -> Quantity:
+        """Creates a quantity of magnitude 1 from the given unit name and
+        returns the result.
+
+        Raises `ValueError` if the unit name is not in the unit namespace.
+        """
+        # TODO test
+        ...
+
     def quantity_negate(self, x: Quantity, /) -> Quantity:
         """Negates the given quantity and returns the result."""
         # TODO test
