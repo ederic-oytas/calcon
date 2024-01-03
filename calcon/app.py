@@ -112,8 +112,7 @@ class App:
         """Creates a unitless quantity from the given magnitude (represented as
         a string) and returns the result.
         """
-        # TODO test
-        ...
+        return Quantity(Decimal(magnitude_str), {})
 
     def quantity_from_unit_name(self, unit_name: str, /) -> Quantity:
         """Creates a quantity of magnitude 1 from the given unit name and
