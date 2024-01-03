@@ -110,6 +110,7 @@ class App:
     #
     def quantity_negate(self, x: Quantity, /) -> Quantity:
         """Negates the given quantity and returns the result."""
+        # TODO test
         return Quantity(-x.magnitude, x.unit)
 
     def quantity_add(self, x: Quantity, y: Quantity, /) -> Quantity:
@@ -117,16 +118,19 @@ class App:
 
         Raises `ValueError` if the quantities have different dimensions.
         """
+        # TODO test
         if self._unit_to_root_unit(x.unit) != self._unit_to_root_unit(y.unit):
             raise ValueError("Cannot add units of different dimensions.")
-        converted_y_magnitude
         return Quantity(x.magnitude + y.magnitude, x.unit)
 
     def quantity_subtract(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Subtracts the quantities and returns the result."""
+        # TODO test
+        ...
 
     def quantity_multiply(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Multiplies the given quantities and returns the result."""
+        # TODO test
         return Quantity(
             x.magnitude * y.magnitude,
             self._unit_multiply(x.unit, y.unit),
@@ -134,6 +138,7 @@ class App:
 
     def quantity_divide(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Divides a quantity by another quantity and returns the result."""
+        # TODO test
         return Quantity(
             x.magnitude / y.magnitude,
             self._unit_divide(x.unit, y.unit),
@@ -142,3 +147,5 @@ class App:
     def quantity_exponentiate(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Raises a quantity to the power of another quantity and returns the
         result."""
+        ...
+        # TODO test
