@@ -42,7 +42,7 @@ class _UnitAliasDefinition(_UnitDefinition):
 class App:
     """Represents a Calcon app."""
 
-    def __init__(self, /):
+    def __init__(self, /) -> None:
         """Creates a new Calcon app object."""
         self._unit_definitions: dict[str, _UnitDefinition] = {}
         self._dimensions_to_units: dict[str, str] = {}
@@ -181,7 +181,8 @@ class App:
 
     def quantity_subtract(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Subtracts the quantities and returns the result."""
-        # TODO test
+        # TODO finish and test
+        return Quantity(Decimal(0), {})
         ...
 
     def quantity_multiply(self, x: Quantity, y: Quantity, /) -> Quantity:
@@ -204,4 +205,5 @@ class App:
         """Raises a quantity to the power of another quantity and returns the
         result."""
         ...
-        # TODO test
+        # TODO finish and test
+        return Quantity(Decimal(0), {})
