@@ -107,37 +107,19 @@ class App:
         except KeyError:
             raise ValueError(f"Unknown unit {unit_name!r}") from None
 
-    def _unit_multiply(
-        self, unit_a: dict[str, Decimal], unit_b: dict[str, Decimal], /
-    ) -> dict[str, Decimal]:
-        """Multiplies the two units and returns the result."""
-        unit_c: dict[str, Decimal] = dict(unit_a)
-        for component_b, power_b in unit_b.items():
-            if power_c := unit_a[component_b] + power_b:
-                unit_c[component_b] = power_c
-        return unit_c
-
-    def _unit_divide(
-        self, unit_a: dict[str, Decimal], unit_b: dict[str, Decimal], /
-    ) -> dict[str, Decimal]:
-        """Divides the two units and returns the result."""
-        unit_c: dict[str, Decimal] = dict(unit_a)
-        for component_b, power_b in unit_b.items():
-            if power_c := unit_a[component_b] - power_b:
-                unit_c[component_b] = power_c
-        return unit_c
-
-    def _unit_exponentiate(
-        self, unit: dict[str, Decimal], exponent: Decimal, /
-    ) -> dict[str, Decimal]:
-        """Raises the given unit to the given exponent and returns the
-        result."""
-        if exponent == 0:
-            return {}
-        return {
-            component: component_power * exponent
-            for component, component_power in unit.items()
-        }
+    def _unit_multiply_power_in_place(
+        self,
+        multiplicand: dict[str, Decimal],
+        multiplier: dict[str, Decimal],
+        exponent: Decimal,
+        /,
+    ) -> None:
+        """Multiplies a unit in-place by another unit raised to a power."""
+        for component, multiplier_power in multiplier.items():
+            multiplicand_power = multiplicand.get(component, 0)
+            result_power = multiplicand_power + multiplier_power * exponent
+            if result_power:
+                multiplicand[component] = result_power
 
     def _unit_to_root_unit(
         self, unit: dict[str, Decimal], /
@@ -174,10 +156,9 @@ class App:
             if isinstance(definition, _RootUnitDefinition):
                 continue
             assert isinstance(definition, _DerivedUnitDefinition)
-            root_magnitude *= definition.root_value.magnitude
-            root_unit = self._unit_multiply(
-                root_unit,
-                self._unit_exponentiate(definition.root_value.unit, power),
+
+            self._unit_multiply_power_in_place(
+                root_unit, definition.root_value.unit, power
             )
         return Quantity(root_magnitude, root_unit)
 
@@ -205,18 +186,16 @@ class App:
     def quantity_multiply(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Multiplies the given quantities and returns the result."""
         # TODO test
-        return Quantity(
-            x.magnitude * y.magnitude,
-            self._unit_multiply(x.unit, y.unit),
-        )
+        result_unit = dict(x.unit)
+        self._unit_multiply_power_in_place(result_unit, y.unit, Decimal(1))
+        return Quantity(x.magnitude * y.magnitude, result_unit)
 
     def quantity_divide(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Divides a quantity by another quantity and returns the result."""
         # TODO test
-        return Quantity(
-            x.magnitude / y.magnitude,
-            self._unit_divide(x.unit, y.unit),
-        )
+        result_unit = dict(x.unit)
+        self._unit_multiply_power_in_place(result_unit, y.unit, Decimal(-1))
+        return Quantity(x.magnitude / y.magnitude, result_unit)
 
     def quantity_exponentiate(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Raises a quantity to the power of another quantity and returns the
