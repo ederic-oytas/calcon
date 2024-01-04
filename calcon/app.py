@@ -33,7 +33,7 @@ class _DerivedUnitDefinition(_UnitDefinition):
 
 
 @dataclass
-class _AliasDefinition(_UnitDefinition):
+class _UnitAliasDefinition(_UnitDefinition):
     """Defines an alias for another unit."""
 
     canonical: str
@@ -78,14 +78,16 @@ class App:
             root_value=root_value
         )
 
-    def define_alias(self, alias: str, canonical: str, /) -> None:
+    def define_unit_alias(self, alias: str, canonical: str, /) -> None:
         """Defines an alias.
 
         Raises `ValueError` if `alias` is already defined.
         """
         if alias in self._unit_definitions:
             raise ValueError(f"Unit {alias!r} is already defined.")
-        self._unit_definitions[alias] = _AliasDefinition(canonical=canonical)
+        self._unit_definitions[alias] = _UnitAliasDefinition(
+            canonical=canonical
+        )
 
     def _unit_lookup(self, unit_name: str, /) -> dict[str, Decimal]:
         """Looks up a unit by its name and returns it.
@@ -94,7 +96,7 @@ class App:
         """
         try:
             definition = self._unit_definitions[unit_name]
-            if isinstance(definition, _AliasDefinition):
+            if isinstance(definition, _UnitAliasDefinition):
                 return {definition.canonical: Decimal(1)}
             assert isinstance(
                 definition, (_RootUnitDefinition, _DerivedUnitDefinition)
