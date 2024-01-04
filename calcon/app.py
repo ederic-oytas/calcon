@@ -45,6 +45,7 @@ class App:
     def __init__(self, /):
         """Creates a new Calcon app object."""
         self._definitions: dict[str, _Definition] = {}
+        self._dimensions_to_units: dict[str, str] = {}
 
     #
     # Definitions
@@ -53,11 +54,18 @@ class App:
     def define_root_unit(self, name: str, dimension: str, /) -> None:
         """Defines a root unit.
 
-        Raises `ValueError` if `name` is already defined.
+        Raises `ValueError` if `name` is already defined or if `dimension` is
+        already associated to a root unit.
         """
         if name in self._definitions:
             raise ValueError(f"Unit {name!r} is already defined.")
+        if dimension in self._dimensions_to_units:
+            raise ValueError(
+                f"Dimension {dimension!r} is already associated to a root "
+                "unit."
+            )
         self._definitions[name] = _RootUnitDefinition(dimension=dimension)
+        self._dimensions_to_units[dimension] = name
 
     def define_derived_unit(self, name: str, root_value: Quantity, /) -> None:
         """Defines a unit derived in terms of a root unit.

@@ -7,13 +7,26 @@ import pytest
 from calcon.app import App, Quantity
 
 
+def test_define_root_unit_same_dimension_error() -> None:
+    """Tests that App.define_root_unit() raises `ValueError` if it uses the
+    same dimension as another root unit."""
+
+    app = App()
+    app.define_root_unit('a', 'length')
+    app.define_root_unit('b', 'time')
+    
+    with pytest.raises(ValueError):
+        app.define_root_unit('c', 'length')
+    with pytest.raises(ValueError):
+        app.define_root_unit('d', 'time')
+
+
 def test_defines() -> None:
     """Tests the define methods"""
     Q = Quantity
     D = Decimal
 
     app = App()
-
     app.define_root_unit("a", "length")
     app.define_derived_unit("b", Q(D(2), {"a": D(1)}))
     app.define_alias("c", "b")
