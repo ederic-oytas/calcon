@@ -62,9 +62,23 @@ class App:
         """Defines an alias."""
         self._definitions[alias] = _AliasDefinition(canonical=canonical)
 
-    #
-    # Unit operations
-    #
+    def _unit_lookup(self, unit_name: str, /) -> dict[str, Decimal]:
+        """Looks up a unit by its name and returns it.
+
+        Raises `ValueError` if the unit doesn't exist.
+        """
+        try:
+            definition = self._definitions[unit_name]
+            if isinstance(definition, _AliasDefinition):
+                return {definition.canonical: Decimal(1)}
+            assert isinstance(
+                definition, (_RootUnitDefinition, _DerivedUnitDefinition)
+            )
+            return {unit_name: Decimal(1)}
+
+        except KeyError:
+            raise ValueError(f"Unknown unit {unit_name!r}") from None
+
     def _unit_multiply(
         self, unit_a: dict[str, Decimal], unit_b: dict[str, Decimal], /
     ) -> dict[str, Decimal]:
@@ -120,8 +134,8 @@ class App:
 
         Raises `ValueError` if the unit name is not in the unit namespace.
         """
-        # TODO test
-        ...
+        # Raises `ValueError` on lookup fail
+        return Quantity(Decimal(1), self._unit_lookup(unit_name))
 
     def quantity_negate(self, x: Quantity, /) -> Quantity:
         """Negates the given quantity and returns the result."""
