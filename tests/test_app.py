@@ -88,3 +88,16 @@ class TestApp:
         )
         with pytest.raises(ValueError):
             f("m")
+
+    def test_quantity_negate(self) -> None:
+        """Tests App.quantity_negate()."""
+        Q = Quantity
+        D = Decimal
+
+        app = App()
+        f = app.quantity_negate
+
+        assert f(Q(D(12), {})) == Q(D(-12), {})
+        assert f(Q(D(12), {"u": D(2)})) == Q(D(-12), {"u": D(2)})
+        assert f(Q(D(0), {})) == Q(D(0), {})
+        assert f(Q(D(-35), {})) == Q(D(35), {})

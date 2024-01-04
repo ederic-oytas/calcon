@@ -162,10 +162,9 @@ class App:
             )
         return Quantity(root_magnitude, root_unit)
 
-    def quantity_negate(self, x: Quantity, /) -> Quantity:
+    def quantity_negate(self, quantity: Quantity, /) -> Quantity:
         """Negates the given quantity and returns the result."""
-        # TODO test
-        return Quantity(-x.magnitude, x.unit)
+        return Quantity(-quantity.magnitude, quantity.unit)
 
     def quantity_add(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Adds the given quantities and returns the result.
