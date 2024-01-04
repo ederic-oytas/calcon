@@ -51,15 +51,30 @@ class App:
     #
 
     def define_root_unit(self, name: str, dimension: str, /) -> None:
-        """Defines a root unit."""
+        """Defines a root unit.
+
+        Raises `ValueError` if `name` is already defined.
+        """
+        if name in self._definitions:
+            raise ValueError(f"Unit {name!r} is already defined.")
         self._definitions[name] = _RootUnitDefinition(dimension=dimension)
 
     def define_derived_unit(self, name: str, root_value: Quantity, /) -> None:
-        """Defines a unit derived in terms of a root unit."""
+        """Defines a unit derived in terms of a root unit.
+
+        Raises `ValueError` if `name` is already defined.
+        """
+        if name in self._definitions:
+            raise ValueError(f"Unit {name!r} is already defined.")
         self._definitions[name] = _DerivedUnitDefinition(root_value=root_value)
 
     def define_alias(self, alias: str, canonical: str, /) -> None:
-        """Defines an alias."""
+        """Defines an alias.
+
+        Raises `ValueError` if `alias` is already defined.
+        """
+        if alias in self._definitions:
+            raise ValueError(f"Unit {alias!r} is already defined.")
         self._definitions[alias] = _AliasDefinition(canonical=canonical)
 
     def _unit_lookup(self, unit_name: str, /) -> dict[str, Decimal]:

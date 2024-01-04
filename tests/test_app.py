@@ -7,6 +7,39 @@ import pytest
 from calcon.app import App, Quantity
 
 
+def test_defines() -> None:
+    """Tests the define methods"""
+    Q = Quantity
+    D = Decimal
+
+    app = App()
+
+    app.define_root_unit("a", "length")
+    app.define_derived_unit("b", Q(D(2), {"a": D(1)}))
+    app.define_alias("c", "b")
+    app.define_root_unit("d", "time")
+
+    # Test ValueError raised when name is already taken
+    with pytest.raises(ValueError):
+        app.define_root_unit("a", "length")
+    with pytest.raises(ValueError):
+        app.define_root_unit("b", "length")
+    with pytest.raises(ValueError):
+        app.define_root_unit("c", "length")
+    with pytest.raises(ValueError):
+        app.define_derived_unit("a", Q(D(3), {}))
+    with pytest.raises(ValueError):
+        app.define_derived_unit("b", Q(D(3), {}))
+    with pytest.raises(ValueError):
+        app.define_derived_unit("c", Q(D(3), {}))
+    with pytest.raises(ValueError):
+        app.define_alias("a", "d")
+    with pytest.raises(ValueError):
+        app.define_alias("b", "d")
+    with pytest.raises(ValueError):
+        app.define_alias("c", "d")
+
+
 def test_quantity_from_magnitude_str() -> None:
     """Tests App.quantity_from_magnitude_str()"""
     app = App()
