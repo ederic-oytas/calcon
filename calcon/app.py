@@ -14,26 +14,26 @@ class Quantity:
 
 
 @dataclass
-class _Definition:
-    """Base class for all definition dataclasses."""
+class _UnitDefinition:
+    """Base class for all unit definition dataclasses."""
 
 
 @dataclass
-class _RootUnitDefinition(_Definition):
+class _RootUnitDefinition(_UnitDefinition):
     """Defines a root unit."""
 
     dimension: str
 
 
 @dataclass
-class _DerivedUnitDefinition(_Definition):
+class _DerivedUnitDefinition(_UnitDefinition):
     """Defines a unit derived from a root unit."""
 
     root_value: Quantity
 
 
 @dataclass
-class _AliasDefinition(_Definition):
+class _AliasDefinition(_UnitDefinition):
     """Defines an alias for another unit."""
 
     canonical: str
@@ -44,46 +44,48 @@ class App:
 
     def __init__(self, /):
         """Creates a new Calcon app object."""
-        self._definitions: dict[str, _Definition] = {}
+        self._unit_definitions: dict[str, _UnitDefinition] = {}
         self._dimensions_to_units: dict[str, str] = {}
 
     #
     # Definitions
     #
 
-    def define_root_unit(self, name: str, dimension: str, /) -> None:
+    def define_root_unit(self, unit: str, dimension: str, /) -> None:
         """Defines a root unit.
 
-        Raises `ValueError` if `name` is already defined or if `dimension` is
+        Raises `ValueError` if `unit` is already defined or if `dimension` is
         already associated to a root unit.
         """
-        if name in self._definitions:
-            raise ValueError(f"Unit {name!r} is already defined.")
+        if unit in self._unit_definitions:
+            raise ValueError(f"Unit {unit!r} is already defined.")
         if dimension in self._dimensions_to_units:
             raise ValueError(
                 f"Dimension {dimension!r} is already associated to a root "
                 "unit."
             )
-        self._definitions[name] = _RootUnitDefinition(dimension=dimension)
-        self._dimensions_to_units[dimension] = name
+        self._unit_definitions[unit] = _RootUnitDefinition(dimension=dimension)
+        self._dimensions_to_units[dimension] = unit
 
-    def define_derived_unit(self, name: str, root_value: Quantity, /) -> None:
+    def define_derived_unit(self, unit: str, root_value: Quantity, /) -> None:
         """Defines a unit derived in terms of a root unit.
 
-        Raises `ValueError` if `name` is already defined.
+        Raises `ValueError` if `unit` is already defined.
         """
-        if name in self._definitions:
-            raise ValueError(f"Unit {name!r} is already defined.")
-        self._definitions[name] = _DerivedUnitDefinition(root_value=root_value)
+        if unit in self._unit_definitions:
+            raise ValueError(f"Unit {unit!r} is already defined.")
+        self._unit_definitions[unit] = _DerivedUnitDefinition(
+            root_value=root_value
+        )
 
     def define_alias(self, alias: str, canonical: str, /) -> None:
         """Defines an alias.
 
         Raises `ValueError` if `alias` is already defined.
         """
-        if alias in self._definitions:
+        if alias in self._unit_definitions:
             raise ValueError(f"Unit {alias!r} is already defined.")
-        self._definitions[alias] = _AliasDefinition(canonical=canonical)
+        self._unit_definitions[alias] = _AliasDefinition(canonical=canonical)
 
     def _unit_lookup(self, unit_name: str, /) -> dict[str, Decimal]:
         """Looks up a unit by its name and returns it.
@@ -91,7 +93,7 @@ class App:
         Raises `ValueError` if the unit doesn't exist.
         """
         try:
-            definition = self._definitions[unit_name]
+            definition = self._unit_definitions[unit_name]
             if isinstance(definition, _AliasDefinition):
                 return {definition.canonical: Decimal(1)}
             assert isinstance(
