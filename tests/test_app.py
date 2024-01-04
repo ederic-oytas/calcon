@@ -23,8 +23,9 @@ class TestApp:
         with pytest.raises(ValueError):
             app.define_root_unit("d", "time")
 
-    def test_defines(self) -> None:
-        """Tests the define methods"""
+    def test_define_methods_redefine_error(self) -> None:
+        """Tests that a `ValueError` is raised for the define methods when
+        a unit is attempted to be redefined."""
         Q = Quantity
         D = Decimal
 
