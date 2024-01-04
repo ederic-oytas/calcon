@@ -7,18 +7,18 @@ import pytest
 from calcon.app import App, Quantity
 
 
-def test_define_root_unit_same_dimension_error() -> None:
-    """Tests that App.define_root_unit() raises `ValueError` if it uses the
-    same dimension as another root unit."""
+def test_define_root_unit_dimension_already_associated() -> None:
+    """Tests that App.define_root_unit() raises `ValueError` when another
+    unit is already associated with the given dimension."""
 
     app = App()
-    app.define_root_unit('a', 'length')
-    app.define_root_unit('b', 'time')
-    
+    app.define_root_unit("a", "length")
+    app.define_root_unit("b", "time")
+
     with pytest.raises(ValueError):
-        app.define_root_unit('c', 'length')
+        app.define_root_unit("c", "length")
     with pytest.raises(ValueError):
-        app.define_root_unit('d', 'time')
+        app.define_root_unit("d", "time")
 
 
 def test_defines() -> None:
@@ -29,7 +29,7 @@ def test_defines() -> None:
     app = App()
     app.define_root_unit("a", "length")
     app.define_derived_unit("b", Q(D(2), {"a": D(1)}))
-    app.define_alias("c", "b")
+    app.define_unit_alias("c", "b")
     app.define_root_unit("d", "time")
 
     # Test ValueError raised when name is already taken
@@ -46,11 +46,11 @@ def test_defines() -> None:
     with pytest.raises(ValueError):
         app.define_derived_unit("c", Q(D(3), {}))
     with pytest.raises(ValueError):
-        app.define_alias("a", "d")
+        app.define_unit_alias("a", "d")
     with pytest.raises(ValueError):
-        app.define_alias("b", "d")
+        app.define_unit_alias("b", "d")
     with pytest.raises(ValueError):
-        app.define_alias("c", "d")
+        app.define_unit_alias("c", "d")
 
 
 def test_quantity_from_magnitude_str() -> None:
@@ -77,7 +77,7 @@ def test_quantity_from_unit_name() -> None:
     app.define_derived_unit(
         "yard", Quantity(Decimal("0.9144"), {"meter": Decimal(1)})
     )
-    app.define_alias("yard_alias", "yard")
+    app.define_unit_alias("yard_alias", "yard")
 
     assert f("meter") == Quantity(Decimal(1), {"meter": Decimal(1)})
     assert (
