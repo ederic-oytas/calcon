@@ -233,7 +233,10 @@ class App:
 
     def quantity_exponentiate(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Raises a quantity to the power of another quantity and returns the
-        result."""
+        result.
+
+        Raises `ValueError` if the exponent isn't dimensionless.
+        """
         y_unit_root_value = self._unit_root_value(y.unit)
         if y_unit_root_value.unit:
             raise ValueError("Exponent must be dimensionless.")
