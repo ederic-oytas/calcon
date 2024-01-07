@@ -21,6 +21,7 @@ class Expression:
         """Evaluates this expression in the context of an app."""
 
 
+@dataclass
 class Unsigned(Expression):
     """Represents an unsigned decimal value."""
 
@@ -33,6 +34,7 @@ class Unsigned(Expression):
         return app.quantity_from_magnitude_str(self.str_value)
 
 
+@dataclass
 class Ident(Expression):
     """Represents an identifier."""
 
