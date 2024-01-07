@@ -3,7 +3,6 @@
 
 from dataclasses import dataclass
 from decimal import Decimal
-from pprint import pprint
 
 
 @dataclass
@@ -84,7 +83,6 @@ class App:
                 unit=value_unit_root_value.unit,
             )
         )
-        pprint(self._unit_definitions)
 
     def define_unit_alias(self, alias: str, canonical: str, /) -> None:
         """Defines an alias.
@@ -186,9 +184,6 @@ class App:
 
         source_unit_root_value = self._unit_root_value(quantity.unit)
         target_unit_root_value = self._unit_root_value(target_unit)
-
-        print(target_unit)
-        print(target_unit_root_value)
 
         if source_unit_root_value.unit != target_unit_root_value.unit:
             raise ValueError("Units have different dimensions.")
