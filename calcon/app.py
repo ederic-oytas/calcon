@@ -239,6 +239,16 @@ class App:
     def quantity_exponentiate(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Raises a quantity to the power of another quantity and returns the
         result."""
-        ...
-        # TODO finish and test
-        return Quantity(Decimal(0), {})
+        y_unit_root_value = self._unit_root_value(y.unit)
+        if y_unit_root_value.unit:
+            raise ValueError("Exponent must be dimensionless.")
+
+        y_root_magnitude = y.magnitude * y_unit_root_value.magnitude
+        if y_root_magnitude == 0:
+            return Quantity(Decimal(1), {})
+
+        result_unit = {}
+        self._unit_multiply_power_in_place(
+            result_unit, x.unit, y_root_magnitude
+        )
+        return Quantity(x.magnitude**y_root_magnitude, result_unit)

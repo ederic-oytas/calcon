@@ -266,3 +266,23 @@ class TestApp:
             f(q(1), q(0))
         with pytest.raises(ValueError):
             f(q(1, second=5), q(0, second=5))
+
+    def test_quantity_exponentiate(self) -> None:
+        """Tests App.quantity_exponentiate()"""
+
+        app = App()
+        app.define_root_unit("meter", "length")
+        app.define_derived_unit("dozen", q(12))
+
+        f = app.quantity_exponentiate
+
+        assert f(q(2, meter=1), q(0)) == q(1)
+        assert f(q(2, meter=1), q(1)) == q(2, meter=1)
+        assert f(q(2, meter=1), q(2)) == q(4, meter=2)
+        assert f(q(2, meter=1), q(5)) == q(32, meter=5)
+        assert f(q(2, meter=1), q(1, dozen=1)) == q(4096, meter=12)
+        assert f(q(2, meter=1), q(-1)) == q("0.5", meter=-1)
+
+        with pytest.raises(ValueError):
+            f(q(2, meter=1), q(1, meter=1))
+            f(q(2, meter=1), q(1, meter=-1))
