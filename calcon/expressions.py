@@ -21,6 +21,30 @@ class Expression:
         """Evaluates this expression in the context of an app."""
 
 
+class Unsigned(Expression):
+    """Represents an unsigned decimal value."""
+
+    str_value: str
+
+    def display_str(self) -> str:
+        return self.str_value
+
+    def evaluate(self, app: App, /) -> Quantity:
+        return app.quantity_from_magnitude_str(self.str_value)
+
+
+class Ident(Expression):
+    """Represents an identifier."""
+
+    str_value: str
+
+    def display_str(self) -> str:
+        return self.str_value
+
+    def evaluate(self, app: App, /) -> Quantity:
+        return app.quantity_from_unit_name(self.str_value)
+
+
 @dataclass
 class _UnaryOperation(Expression):
     """Represents a unary operation."""
