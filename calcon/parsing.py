@@ -49,5 +49,11 @@ class _Transformer(lark.Transformer):
 
     exponentiate = Exponentiate
 
-    unsigned = Unsigned
-    ident = Ident
+    # For unsigned and ident, the token needs to be converted to str because
+    # the repr() of the token is different.
+
+    def unsigned(self, token: lark.Token) -> Expression:
+        return Unsigned(str(token))
+
+    def ident(self, token: lark.Token) -> Expression:
+        return Ident(str(token))
