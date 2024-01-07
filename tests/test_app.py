@@ -100,19 +100,6 @@ class TestApp:
         with pytest.raises(ValueError):
             f("m")
 
-    def test_quantity_negate(self) -> None:
-        """Tests App.quantity_negate()."""
-        Q = Quantity
-        D = Decimal
-
-        app = App()
-        f = app.quantity_negate
-
-        assert f(Q(D(12), {})) == Q(D(-12), {})
-        assert f(Q(D(12), {"u": D(2)})) == Q(D(-12), {"u": D(2)})
-        assert f(Q(D(0), {})) == Q(D(0), {})
-        assert f(Q(D(-35), {})) == Q(D(35), {})
-
     def test_quantity_convert__time(self) -> None:
         """Tests App.quantity_convert_to_same_unit() with time units"""
 
@@ -192,3 +179,16 @@ class TestApp:
             app.quantity_convert(q(1, second=1), u(minute=2))
         with pytest.raises(ValueError):
             app.quantity_convert(q(1, second=1), u(second=-1))
+
+    def test_quantity_negate(self) -> None:
+        """Tests App.quantity_negate()."""
+        Q = Quantity
+        D = Decimal
+
+        app = App()
+        f = app.quantity_negate
+
+        assert f(Q(D(12), {})) == Q(D(-12), {})
+        assert f(Q(D(12), {"u": D(2)})) == Q(D(-12), {"u": D(2)})
+        assert f(Q(D(0), {})) == Q(D(0), {})
+        assert f(Q(D(-35), {})) == Q(D(35), {})
