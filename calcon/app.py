@@ -252,3 +252,16 @@ class App:
             result_unit, x.unit, y_root_magnitude
         )
         return Quantity(x.magnitude**y_root_magnitude, result_unit)
+
+    def quantity_display_str(self, x: Quantity) -> str:
+        """Returns a string representation for display for the given
+        quantity."""
+
+        factors = [str(x.magnitude)]
+        for component, power in x.unit.items():
+            if power == 1:
+                factors.append(component)
+            else:
+                factors.append(f"{component}^{power}")
+
+        return " * ".join(factors)

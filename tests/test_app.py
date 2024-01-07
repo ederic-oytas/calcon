@@ -286,3 +286,22 @@ class TestApp:
         with pytest.raises(ValueError):
             f(q(2, meter=1), q(1, meter=1))
             f(q(2, meter=1), q(1, meter=-1))
+
+    def test_quantity_display_str(self) -> None:
+        """Tests App.quantity_display_str()"""
+
+        app = App()
+        f = app.quantity_display_str
+
+        # Tests shouldn't be too strict. This is mainly for sanity tests and
+        # test coverage (this file should completely cover app.py).
+
+        # If unitless, then no units should be displayed at all
+        assert f(q(5)) == "5"
+
+        # Just check that the units are in there.
+        s = f(q(303_975, kilogram=1, meter=-1, second=-2))
+        assert "303975" in s
+        assert "kilogram" in s
+        assert "meter" in s
+        assert "second" in s
