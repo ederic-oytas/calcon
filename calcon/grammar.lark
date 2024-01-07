@@ -13,7 +13,7 @@ IDENT: /[a-zA-Z_]+/
     | prod "*" adj         -> multiply
     | prod "/" adj         -> divide
 ?adj: sig
-    | adj sig
+    | adj sig              -> multiply
 ?sig: pow
     | "+" sig              -> positive
     | "-" sig              -> negate
