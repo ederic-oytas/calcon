@@ -4,8 +4,6 @@
 import lark
 import typer
 
-from calcon.parsing import parse_expr
-
 
 app = typer.Typer(no_args_is_help=True)
 

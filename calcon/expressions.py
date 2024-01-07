@@ -3,7 +3,6 @@
 
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import ClassVar
 
 from calcon.app import App, Quantity
 

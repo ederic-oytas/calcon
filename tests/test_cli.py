@@ -10,7 +10,7 @@ from typer.testing import CliRunner
 
 import pytest
 from calcon.main import app as main_app, create_default_calcon_app
-from calcon.app import App, Quantity
+from calcon.app import Quantity
 from calcon.parsing import parse_expr
 
 
