@@ -135,7 +135,7 @@ class App:
     def _unit_root_value(self, unit: dict[str, Decimal], /) -> Quantity:
         """Returns the root value of the given unit."""
         root_magnitude = Decimal(1)
-        root_unit = {}
+        root_unit: dict[str, Decimal] = {}
         for component, power in unit.items():
             definition = self._unit_definitions[component]
 
@@ -245,7 +245,7 @@ class App:
         if y_root_magnitude == 0:
             return Quantity(Decimal(1), {})
 
-        result_unit = {}
+        result_unit: dict[str, Decimal] = {}
         self._unit_multiply_power_in_place(
             result_unit, x.unit, y_root_magnitude
         )
