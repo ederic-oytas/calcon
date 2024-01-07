@@ -21,7 +21,7 @@ def u(**unit: Union[int, str]) -> dict[str, Decimal]:
 class TestApp:
     """Tests the App class."""
 
-    def test_define_root_unit_dimension_already_associated(self) -> None:
+    def test_define_root__unit_dimension_already_associated(self) -> None:
         """Tests that App.define_root_unit() raises `ValueError` when another
         unit is already associated with the given dimension."""
 
@@ -113,7 +113,7 @@ class TestApp:
         assert f(Q(D(0), {})) == Q(D(0), {})
         assert f(Q(D(-35), {})) == Q(D(35), {})
 
-    def test_convert__time(self) -> None:
+    def test_quantity_convert__time(self) -> None:
         """Tests App.quantity_convert_to_same_unit() with time units"""
 
         # Define apps (all have equivalent unit systems)
@@ -150,7 +150,7 @@ class TestApp:
                 for b in equivalent:
                     assert app.quantity_convert(a, b.unit) == b
 
-    def test_convert__pressure(self) -> None:
+    def test_quantity_convert__pressure(self) -> None:
         """Tests App.quantity_convert_to_same_unit() with pressure units"""
 
         # Pressure dimensions: Mass * Length^-1 * Time^-2
@@ -174,7 +174,7 @@ class TestApp:
             for b in equivalent:
                 assert app.quantity_convert(a, b.unit) == b
 
-    def test_convert__different_dimensions(self) -> None:
+    def test_quantity_convert__different_dimensions(self) -> None:
         app = App()
         app.define_root_unit("second", "time")
         app.define_derived_unit("minute", q(60, second=1))

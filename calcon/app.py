@@ -73,7 +73,6 @@ class App:
 
         Raises `ValueError` if `unit` is already defined.
         """
-        # TODO test
         if unit in self._unit_definitions:
             raise ValueError(f"Unit {unit!r} is already defined.")
 
@@ -97,6 +96,10 @@ class App:
         self._unit_definitions[alias] = _UnitAliasDefinition(
             canonical=canonical
         )
+
+    #
+    # Unit operations
+    #
 
     def _unit_lookup(self, unit_name: str, /) -> dict[str, Decimal]:
         """Looks up a unit by its name and returns it.
@@ -128,14 +131,6 @@ class App:
             result_power = multiplicand_power + multiplier_power * exponent
             if result_power:
                 multiplicand[component] = result_power
-
-    def _unit_to_root_unit(
-        self, unit: dict[str, Decimal], /
-    ) -> dict[str, Decimal]:
-        """Converts the given unit into an equivalent root unit and returns the
-        result."""
-        result_unit: dict[str, Decimal] = {}
-        return result_unit
 
     def _unit_root_value(self, unit: dict[str, Decimal], /) -> Quantity:
         """Returns the root value of the given unit."""
@@ -178,21 +173,6 @@ class App:
         # Raises `ValueError` on lookup fail
         return Quantity(Decimal(1), self._unit_lookup(unit_name))
 
-    def _quantity_in_root_terms(self, quantity: Quantity, /) -> Quantity:
-        """Converts a quantity into its root units and returns the result."""
-        root_magnitude = quantity.magnitude
-        root_unit = {}
-        for component, power in quantity.unit.items():
-            definition = self._unit_definitions[component]
-            if isinstance(definition, _RootUnitDefinition):
-                continue
-            assert isinstance(definition, _DerivedUnitDefinition)
-
-            self._unit_multiply_power_in_place(
-                root_unit, definition.root_value.unit, power
-            )
-        return Quantity(root_magnitude, root_unit)
-
     def quantity_convert(
         self, quantity: Quantity, target_unit: dict[str, Decimal], /
     ) -> Quantity:
@@ -229,9 +209,7 @@ class App:
 
         Raises `ValueError` if the quantities have different dimensions.
         """
-        # TODO test
-        if self._unit_to_root_unit(x.unit) != self._unit_to_root_unit(y.unit):
-            raise ValueError("Cannot add units of different dimensions.")
+        # TODO finish and test
         return Quantity(x.magnitude + y.magnitude, x.unit)
 
     def quantity_subtract(self, x: Quantity, y: Quantity, /) -> Quantity:
