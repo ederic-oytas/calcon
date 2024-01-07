@@ -131,7 +131,7 @@ class Multiply(_BinaryOperation):
         return f"({self.left.display_str()} * {self.right.display_str()})"
 
     def evaluate(self, app: App, /) -> Quantity:
-        return app.quantity_add(
+        return app.quantity_multiply(
             self.left.evaluate(app), self.right.evaluate(app)
         )
 
