@@ -89,7 +89,7 @@ class Convert(_BinaryOperation):
     """Represents a conversion operation."""
 
     def display_str(self) -> str:
-        return f"({self.left.display_str()} - {self.right.display_str()})"
+        return f"({self.left.display_str()} -> {self.right.display_str()})"
 
     def evaluate(self, app: App, /) -> Quantity:
         return app.quantity_convert(
