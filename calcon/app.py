@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass
 from decimal import Decimal
+from pprint import pprint
 
 
 @dataclass
@@ -75,9 +76,16 @@ class App:
         # TODO test
         if unit in self._unit_definitions:
             raise ValueError(f"Unit {unit!r} is already defined.")
+
+        value_unit_root_value = self._unit_root_value(value.unit)
+
         self._unit_definitions[unit] = _DerivedUnitDefinition(
-            root_value=self._quantity_in_root_terms(value)
+            root_value=Quantity(
+                magnitude=value.magnitude * value_unit_root_value.magnitude,
+                unit=value_unit_root_value.unit,
+            )
         )
+        pprint(self._unit_definitions)
 
     def define_unit_alias(self, alias: str, canonical: str, /) -> None:
         """Defines an alias.
@@ -129,6 +137,29 @@ class App:
         result_unit: dict[str, Decimal] = {}
         return result_unit
 
+    def _unit_root_value(self, unit: dict[str, Decimal], /) -> Quantity:
+        """Returns the root value of the given unit."""
+        root_magnitude = Decimal(1)
+        root_unit = {}
+        for component, power in unit.items():
+            definition = self._unit_definitions[component]
+
+            # If component is a root unit, then just multiply the unit
+            if isinstance(definition, _RootUnitDefinition):
+                self._unit_multiply_power_in_place(
+                    root_unit, {component: power}, Decimal(1)
+                )
+                continue
+
+            # Multiply the term
+            assert isinstance(definition, _DerivedUnitDefinition)
+            root_magnitude *= definition.root_value.magnitude
+            self._unit_multiply_power_in_place(
+                root_unit, definition.root_value.unit, power
+            )
+
+        return Quantity(root_magnitude, root_unit)
+
     #
     # Quantity operations
     #
@@ -161,6 +192,33 @@ class App:
                 root_unit, definition.root_value.unit, power
             )
         return Quantity(root_magnitude, root_unit)
+
+    def quantity_convert(
+        self, quantity: Quantity, target_unit: dict[str, Decimal], /
+    ) -> Quantity:
+        """Converts the first quantity to the same units as the second quantity
+        and returns the result.
+
+        Raises `ValueError` if the quantities have different dimensions.
+        """
+
+        source_unit_root_value = self._unit_root_value(quantity.unit)
+        target_unit_root_value = self._unit_root_value(target_unit)
+
+        print(target_unit)
+        print(target_unit_root_value)
+
+        if source_unit_root_value.unit != target_unit_root_value.unit:
+            raise ValueError("Units have different dimensions.")
+
+        return Quantity(
+            magnitude=(
+                quantity.magnitude
+                * source_unit_root_value.magnitude
+                / target_unit_root_value.magnitude
+            ),
+            unit=target_unit,
+        )
 
     def quantity_negate(self, quantity: Quantity, /) -> Quantity:
         """Negates the given quantity and returns the result."""
