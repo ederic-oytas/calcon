@@ -192,3 +192,43 @@ class TestApp:
         assert f(Q(D(12), {"u": D(2)})) == Q(D(-12), {"u": D(2)})
         assert f(Q(D(0), {})) == Q(D(0), {})
         assert f(Q(D(-35), {})) == Q(D(35), {})
+
+    def test_quantity_add(self) -> None:
+        """Tests App.quantity_add()"""
+        app = App()
+        app.define_root_unit("second", "time")
+        app.define_derived_unit("minute", q(60, second=1))
+        app.define_root_unit("meter", "length")
+
+        f = app.quantity_add
+
+        assert f(q(1, second=1), q(3, second=1)) == q(4, second=1)
+        assert f(q(1, minute=1), q(3, second=1)) == q("1.05", minute=1)
+        assert f(q(1, second=1), q(3, minute=1)) == q(181, second=1)
+        assert f(q(1, minute=1), q(3, minute=1)) == q(4, minute=1)
+
+        # different dimensions -> ValueError
+        with pytest.raises(ValueError):
+            f(q(1, second=1), q(2, meter=1))
+        with pytest.raises(ValueError):
+            f(q(1, second=1), q(2, second=-1))
+
+    def test_quantity_subtract(self) -> None:
+        """Tests App.quantity_subtract()"""
+        app = App()
+        app.define_root_unit("second", "time")
+        app.define_derived_unit("minute", q(60, second=1))
+        app.define_root_unit("meter", "length")
+
+        f = app.quantity_subtract
+
+        assert f(q(1, second=1), q(3, second=1)) == q(-2, second=1)
+        assert f(q(1, minute=1), q(3, second=1)) == q("0.95", minute=1)
+        assert f(q(1, second=1), q(3, minute=1)) == q(-179, second=1)
+        assert f(q(1, minute=1), q(3, minute=1)) == q(-2, minute=1)
+
+        # different dimensions -> ValueError
+        with pytest.raises(ValueError):
+            f(q(1, second=1), q(2, meter=1))
+        with pytest.raises(ValueError):
+            f(q(1, second=1), q(2, second=-1))

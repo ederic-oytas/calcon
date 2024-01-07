@@ -209,14 +209,13 @@ class App:
 
         Raises `ValueError` if the quantities have different dimensions.
         """
-        # TODO finish and test
+        y = self.quantity_convert(y, x.unit)
         return Quantity(x.magnitude + y.magnitude, x.unit)
 
     def quantity_subtract(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Subtracts the quantities and returns the result."""
-        # TODO finish and test
-        return Quantity(Decimal(0), {})
-        ...
+        y = self.quantity_convert(y, x.unit)
+        return Quantity(x.magnitude - y.magnitude, x.unit)
 
     def quantity_multiply(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Multiplies the given quantities and returns the result."""
