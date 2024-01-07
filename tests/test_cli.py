@@ -32,14 +32,16 @@ runner = CliRunner()
     [
         ("1000 * gram -> kilogram", q(1, kilogram=1)),
         ("(3 * meter) * (4 * meter)", q(12, meter=2)),
-        ("(3 * meter) / (4 * meter)", q("0.75")),
-        ("(3 * meter) + (4 * meter)", q(7, meter=1)),
-        ("(3 * meter) - (4 * meter)", q(-1, meter=1)),
-        ("---(4 * meter)", q(-4, meter=1)),
-        ("+++(4 * meter)", q(4, meter=1)),
-        ("(3 * meter**2) + (4 * meter^2)", q(7, meter=2)),
-        ("(3 * m**2) + (4 * m^2)", q(7, meter=2)),
-        ("(5 * m)**0", q(1)),
+        ("2 3 4", q(24)),
+        ("3 meter * 4 meter", q(12, meter=2)),
+        ("3 meter / 4 meter", q("0.75")),
+        ("3 meter + 4 meter", q(7, meter=1)),
+        ("3 meter - 4 meter", q(-1, meter=1)),
+        ("---(4 meter)", q(-4, meter=1)),
+        ("+++(4 meter)", q(4, meter=1)),
+        ("(3 meter**2) + (4 meter^2)", q(7, meter=2)),
+        ("(3 m**2) + (4 m^2)", q(7, meter=2)),
+        ("(5 m)**0", q(1)),
     ],
 )
 def test_successes(input_expr: str, expected_quantity: Quantity):
@@ -69,7 +71,7 @@ def test_successes(input_expr: str, expected_quantity: Quantity):
     "input_expr",
     [
         "5 *",
-        "5 meter",
+        "5 +",
     ],
 )
 def test_syntax_errors(input_expr: str):

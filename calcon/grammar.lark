@@ -9,11 +9,11 @@ IDENT: /[a-zA-Z_]+/
 ?sum: prod
     | sum "+" prod         -> add
     | sum "-" prod         -> subtract
-?prod: sig
-    | prod "*" sig         -> multiply
-    | prod "/" sig         -> divide
-//?adj: sig
-//    | adj sig              -> multiply
+?prod: adj
+    | prod "*" adj         -> multiply
+    | prod "/" adj         -> divide
+?adj: sig
+    | adj pow              -> multiply
 ?sig: pow
     | "+" sig              -> positive
     | "-" sig              -> negate
