@@ -232,3 +232,37 @@ class TestApp:
             f(q(1, second=1), q(2, meter=1))
         with pytest.raises(ValueError):
             f(q(1, second=1), q(2, second=-1))
+
+    def test_quantity_multiply(self) -> None:
+        """Tests App.quantity_multiply()"""
+        app = App()
+        app.define_root_unit("second", "time")
+        app.define_derived_unit("minute", q(60, second=1))
+        app.define_root_unit("meter", "length")
+
+        f = app.quantity_multiply
+
+        assert f(q(3, second=2), q(4, meter=5)) == q(12, second=2, meter=5)
+        assert f(q(3, second=2), q(4, second=2)) == q(12, second=4)
+        assert f(q(3, second=2), q(4, second=-2)) == q(12)
+        assert f(q(3, second=2), q(4, second=-2, meter=3)) == q(12, meter=3)
+
+    def test_quantity_divide(self) -> None:
+        """Tests App.quantity_divide()"""
+        app = App()
+        app.define_root_unit("second", "time")
+        app.define_derived_unit("minute", q(60, second=1))
+        app.define_root_unit("meter", "length")
+
+        f = app.quantity_divide
+
+        assert f(q(3, second=2), q(4, meter=5)) == q(".75", second=2, meter=-5)
+        assert f(q(3, second=2), q(4, second=2)) == q(".75")
+        assert f(q(3, second=2), q(4, second=-2)) == q(".75", second=4)
+        assert f(q(3, second=2), q(4, second=-2, meter=3)) == q(
+            ".75", second=4, meter=-3
+        )
+        with pytest.raises(ValueError):
+            f(q(1), q(0))
+        with pytest.raises(ValueError):
+            f(q(1, second=5), q(0, second=5))

@@ -131,6 +131,8 @@ class App:
             result_power = multiplicand_power + multiplier_power * exponent
             if result_power:
                 multiplicand[component] = result_power
+            else:
+                multiplicand.pop(component, None)
 
     def _unit_root_value(self, unit: dict[str, Decimal], /) -> Quantity:
         """Returns the root value of the given unit."""
@@ -219,16 +221,19 @@ class App:
 
     def quantity_multiply(self, x: Quantity, y: Quantity, /) -> Quantity:
         """Multiplies the given quantities and returns the result."""
-        # TODO test
         result_unit = dict(x.unit)
         self._unit_multiply_power_in_place(result_unit, y.unit, Decimal(1))
         return Quantity(x.magnitude * y.magnitude, result_unit)
 
     def quantity_divide(self, x: Quantity, y: Quantity, /) -> Quantity:
-        """Divides a quantity by another quantity and returns the result."""
-        # TODO test
+        """Divides a quantity by another quantity and returns the result.
+
+        Raises `ValueError` if a division by zero error occurs.
+        """
         result_unit = dict(x.unit)
         self._unit_multiply_power_in_place(result_unit, y.unit, Decimal(-1))
+        if y.magnitude == 0:
+            raise ValueError("Cannot divide by zero!")
         return Quantity(x.magnitude / y.magnitude, result_unit)
 
     def quantity_exponentiate(self, x: Quantity, y: Quantity, /) -> Quantity:
