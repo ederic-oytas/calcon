@@ -49,6 +49,8 @@ runner = CliRunner()
         ("2.5e-12", q("2.5e-12")),
         ("2.5e+12", q("2.5e+12")),
         ("2.5E12", q("2.5E12")),
+        ("1_2", q("12")),
+        ("1_2_3.7_5e+6_7", q("123.75e67")),
     ],
 )
 def test_successes(input_expr: str, expected_quantity: Quantity):

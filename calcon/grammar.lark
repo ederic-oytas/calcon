@@ -1,5 +1,6 @@
 
-UNSIGNED.2: /(\d+(?:\.\d*)?|\.\d+)((e|E)(-|\+)?\d+)?/
+UINT: /\d(_?\d)*/
+UNSIGNED.2: (UINT ("." UINT?)? | "." UINT) (/[eE][-+]?/ UINT)?
 IDENT: /([^0-9\W]|\u00B0)+/
 // \u00B0 : degree symbol
 _NEWLINE: NEWLINE
