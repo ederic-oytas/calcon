@@ -1,5 +1,5 @@
 
-UNSIGNED: /\d+(?:\.\d*)?|\.\d+'/
+UNSIGNED: /\d+(?:\.\d*)?|\.\d+/
 IDENT: /[a-zA-Z_]+/
 
 ?expr: conv
