@@ -20,7 +20,8 @@ class Statement:
 
 @dataclass
 class DefineRootSymbolAliases(Statement):
-    """Represents a statement which defines a root unit and its aliases"""
+    """Represents a statement which defines a root unit and its aliases. (For
+    now, the symbol is treated as an alias.)"""
 
     unit: str
     symbol: Optional[str]
@@ -37,7 +38,8 @@ class DefineRootSymbolAliases(Statement):
 
 @dataclass
 class DefineDerivedSymbolAliases(Statement):
-    """Represents a statement which defines a derived unit."""
+    """Represents a statement which defines a derived unit and its aliases.
+    (For now, the symbol is treated as an alias.)"""
 
     unit: str
     symbol: Optional[str]
