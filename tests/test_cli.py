@@ -42,6 +42,17 @@ runner = CliRunner()
         ("(3 meter**2) + (4 meter^2)", q(7, meter=2)),
         ("(3 m**2) + (4 m^2)", q(7, meter=2)),
         ("(5 m)**0", q(1)),
+        ("(3 * meter) / (4 * meter)", q("0.75")),
+        ("(3 * meter) + (4 * meter)", q(7, meter=1)),
+        ("(3 * meter) - (4 * meter)", q(-1, meter=1)),
+        ("---(4 * meter)", q(-4, meter=1)),
+        ("+++(4 * meter)", q(4, meter=1)),
+        ("(3 * meter**2) + (4 * meter^2)", q(7, meter=2)),
+        ("(3 * m**2) + (4 * m^2)", q(7, meter=2)),
+        ("(5 * m)**0", q(1)),
+        ("12.", q(12)),
+        ("1.2", q("1.2")),
+        (".12", q(".12")),
     ],
 )
 def test_successes(input_expr: str, expected_quantity: Quantity):

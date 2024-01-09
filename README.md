@@ -25,3 +25,11 @@ Example output for `calcon "5 * kilogram + 5 * gram"`:
 
 Currently, there are only a limited number of units supported, but more will
 be supported in the future.
+
+## Changelog
+
+### 0.1.1
+
+- Added this changelog
+
+- Fixed parsing numbers with leading period (`.`)
