@@ -67,7 +67,7 @@ class _Transformer(lark.Transformer):
         # converts lark.Token into strings
         unit = str(unit)
         if symbol is not None:
-            symbol = str(unit)
+            symbol = str(symbol)
 
         aliases: list[str]
         dimension: str
@@ -93,7 +93,7 @@ class _Transformer(lark.Transformer):
         # converts lark.Token into strings
         unit = str(unit)
         if symbol is not None:
-            symbol = str(unit)
+            symbol = str(symbol)
 
         aliases: list[str]
         value: Expression

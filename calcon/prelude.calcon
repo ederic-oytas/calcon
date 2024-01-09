@@ -1,0 +1,117 @@
+
+# Follows this guide:
+# https://physics.nist.gov/cuu/pdf/sp811.pdf
+
+#
+# Root Unit Definitions
+# ---------------------
+#
+# These unit definitions define the basis for the unit system. Note that "root
+# units" from "base units". This is done for the purpose of unit prefixes
+# (which will be added later on).
+#
+# Syntax:
+#
+#     1 UNIT (SYMBOL) [ALIASES...] :: DIMENSION
+#
+# SYMBOL and ALIASES are both optional. ALIASES must contain at least one unit
+# when specified.
+#
+
+1 meter (m) [metre] :: Length
+1 gram (g) [gramme] :: Mass
+1 second (s) [sec]  :: Time
+1 ampere (A) [amp]  :: Current
+1 kelvin (K)        :: Temperature
+1 mole (mol)        :: Substance
+1 candela (cd)      :: Luminosity
+
+#
+# Derived Units
+# -------------
+#
+# These units are derived from other units.
+#
+# Syntax:
+#
+#     1 UNIT (SYMBOL) [ALIASES...] = VALUE
+#
+# SYMBOL and ALIASES are both optional. ALIASES must contain at least one unit
+# when specified.
+#
+
+# Pi up to 100 digits
+1 pi = 3.1415926535_8979323846_2643383279_5028841971_6939937510_5820974944_5923078164_0628620899_8628034825_3421170679
+
+# prefixes to be implemented later
+1 kilogram (kg) [kilogramme] = 1000 gram
+
+1 radian (rad)    = 1
+1 steradian (sr)  = 1
+1 hertz (Hz) [hz] = s^-1
+1 newton (N)      = m kg s^-2
+1 pascal (Pa)     = N/m^2
+1 joule (J)       = N m
+1 watt (W)        = J/s
+1 coulomb (C)     = s A
+1 volt (V)        = W/A
+1 farad (F)       = C/V
+1 ohm (Ω)         = V/A
+1 siemens (S)     = A/V
+1 weber (Wb)      = V s
+1 tesla (T)       = Wb/m^2
+1 henry (H)       = Wb/A
+# degree_celsius  (to be implemented)
+1 lumen (lm)      = cd sr
+1 lux (lx)        = lm/m^2
+1 becquerel (Bq)  = s^-1
+1 gray (Gy)       = J/kg
+1 sievert (Sv)    = J/kg
+1 katal (kat)     = s^-1 mol
+
+1 minute (min)         = 60 s
+1 hour (h) [hr]        = 60 min
+1 day (d)              = 24 hour
+1 degree (°)           = (pi/180) rad
+1 angle_minute         = (1/60) degree
+1 angle_second         = (1/60) minute
+1 hectare (ha)         = 10000 m^2
+1 liter (L) [l, litre] = 0.001 m^3
+1 metric_ton [metric_tonne, ton, tonne] = 1000 kg
+# Not implemented:
+#   neper
+#   bel
+#   decibel
+
+# Not implemented:
+#   electronvolt
+#   astromical unit
+#   unified atomic mass unit
+#   dalton
+
+# Not implemented:
+#   speed of light in a vacuum
+#   planck constant divided by 2 pi
+#   electron rest mass
+#   elementary charge
+#   Bohr radius
+#   Hartree energy
+#   ratio of action to energy
+
+# ^ should find an official up-to-date definition of these units
+
+1 nautical_mile = 1852 m
+1 knot          = (1852/3600) (m/s)
+1 angstrom (Å)  = 10e-10 m
+1 barn (b)      = 10e-28 m^2
+1 millimeter_of_mercury (mmHg) = 133.322 Pa
+
+1 curie (Ci) = 3.7e10
+1 roentgen (R) = 2.58e-4
+# rad (not defined, name conflicts with radian symbol)
+1 rem = 10^-2 Sv
+
+# To add?
+#   US customary units (e.g. inch, mile)
+#   CGS units
+#   Other units

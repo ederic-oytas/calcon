@@ -51,6 +51,9 @@ runner = CliRunner()
         ("2.5E12", q("2.5E12")),
         ("1_2", q("12")),
         ("1_2_3.7_5e+6_7", q("123.75e67")),
+        ("12 J / 3 m -> N", q(4, newton=1)),
+        ("12 ohm * 3 A -> V", q(36, volt=1)),
+        ("86400s -> d", q(1, day=1)),
     ],
 )
 def test_successes(input_expr: str, expected_quantity: Quantity):
