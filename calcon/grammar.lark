@@ -1,9 +1,13 @@
 
 UNSIGNED: /\d+(?:\.\d*)?|\.\d+'/
 IDENT: /[a-zA-Z_]+/
+_NEWLINE: NEWLINE
+
+?stmtseq: _NEWLINE* (stmt (_NEWLINE+ stmt)*)? _NEWLINE*  -> statement_sequence
+?stmt: defd
+?defd: "1" IDENT ["(" IDENT ")"] ("[" IDENT ("," IDENT)* "]")? "=" expr
 
 ?expr: conv
-
 ?conv: sum
     | conv "->" sum        -> convert
 ?sum: prod
@@ -23,6 +27,7 @@ IDENT: /[a-zA-Z_]+/
     | IDENT                -> ident
     | "(" expr ")"
 
-%import common.WS
+%import common.WS_INLINE
+%import common.NEWLINE
 
-%ignore WS
+%ignore WS_INLINE

@@ -15,11 +15,25 @@ from calcon.expressions import (
     Subtract,
     Unsigned,
 )
+from calcon.statements import DefineDerived, Statement
 
-
+_stmtseq_parser = lark.Lark.open_from_package(
+    __name__, "grammar.lark", start="stmtseq"
+)
 _expr_parser = lark.Lark.open_from_package(
     __name__, "grammar.lark", start="expr"
 )
+
+
+def parse_statements(text: str, /) -> tuple[Statement, ...]:
+    """Parses the given text as a tuple of statements and returns it."""
+    parse_result = _stmtseq_parser.parse(text)
+    assert isinstance(parse_result, lark.Tree)
+    assert parse_result.data == "statement_sequence"
+    transformer = _Transformer()
+    statements = transformer.transform(parse_result)
+    assert isinstance(statements, tuple)
+    return statements
 
 
 def parse_expr(text: str, /) -> Expression:
@@ -35,6 +49,12 @@ def parse_expr(text: str, /) -> Expression:
 @lark.v_args(inline=True)
 class _Transformer(lark.Transformer):
     """Transforms the tree into an Expression tree."""
+
+    def statement_sequence(self, *statements: Statement):
+        return statements
+
+    def define_derived(self, unit: lark.Token, expr: Expression) -> Statement:
+        return DefineDerived(str(unit), expr)
 
     convert = Convert
 
