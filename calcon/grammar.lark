@@ -6,7 +6,9 @@ IDENT: /([^0-9\W]|\u00B0)+/
 _NEWLINE: NEWLINE
 
 ?stmtseq: _NEWLINE* (stmt (_NEWLINE+ stmt)*)? _NEWLINE*  -> statement_sequence
-?stmt: defdsa
+?stmt: defrsa
+    | defdsa
+?defrsa: "1" IDENT ["(" IDENT ")"] ("[" IDENT ("," IDENT)* "]")? "::" IDENT -> define_root_symbol_aliases
 ?defdsa: "1" IDENT ["(" IDENT ")"] ("[" IDENT ("," IDENT)* "]")? "=" expr -> define_derived_symbol_aliases
 
 ?expr: conv

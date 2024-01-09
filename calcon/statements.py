@@ -19,14 +19,20 @@ class Statement:
 
 
 @dataclass
-class DefineRoot(Statement):
-    """Represents a statement which defines a root unit."""
+class DefineRootSymbolAliases(Statement):
+    """Represents a statement which defines a root unit and its aliases"""
 
     unit: str
+    symbol: Optional[str]
+    aliases: list[str]
     dimension: str
 
     def execute(self, app: App, /) -> None:
         app.define_root_unit(self.unit, self.dimension)
+        if self.symbol is not None:
+            app.define_unit_alias(self.symbol, self.unit)
+        for alias in self.aliases:
+            app.define_unit_alias(alias, self.unit)
 
 
 @dataclass
@@ -44,14 +50,3 @@ class DefineDerivedSymbolAliases(Statement):
             app.define_unit_alias(self.symbol, self.unit)
         for alias in self.aliases:
             app.define_unit_alias(alias, self.unit)
-
-
-@dataclass
-class DefineAlias(Statement):
-    """Represents a statement which defines a unit alias."""
-
-    alias: str
-    canonical: str
-
-    def execute(self, app: App, /) -> None:
-        app.define_unit_alias(self.alias, self.canonical)

@@ -42,6 +42,20 @@ def test_statements() -> None:
     )
     assert len(statements) == 3
 
+    # Define root statements
+    assert len(parse_statements("1 meter :: Length")) == 1
+    assert len(parse_statements("1 meter (m) :: Length")) == 1
+    assert len(parse_statements("1 meter [metre] :: Length")) == 1
+    assert len(parse_statements("1 meter (m) [metre] :: Length")) == 1
+    assert len(parse_statements("1 meter (m) [metre, analias] :: Length")) == 1
+    statements = parse_statements(
+        """
+        1 meter (m) [metre] :: Length
+        1 gram (g) [gramme] :: Mass
+        """
+    )
+    assert len(statements) == 2
+
     # Test unicode characters
     assert len(parse_statements("1 angstrom (Å)  = 10e-10 m")) == 1
     assert len(parse_statements("1 degree (°) = (pi/180) rad")) == 1

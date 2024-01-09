@@ -16,7 +16,11 @@ from calcon.expressions import (
     Subtract,
     Unsigned,
 )
-from calcon.statements import DefineDerivedSymbolAliases, Statement
+from calcon.statements import (
+    DefineDerivedSymbolAliases,
+    DefineRootSymbolAliases,
+    Statement,
+)
 
 _stmtseq_parser = lark.Lark.open_from_package(
     __name__, "grammar.lark", start="stmtseq"
@@ -53,6 +57,32 @@ class _Transformer(lark.Transformer):
 
     def statement_sequence(self, *statements: Statement):
         return statements
+
+    def define_root_symbol_aliases(
+        self,
+        unit: str,
+        symbol: Optional[str],
+        *rest: Any,
+    ) -> Statement:
+        # converts lark.Token into strings
+        unit = str(unit)
+        if symbol is not None:
+            symbol = str(unit)
+
+        aliases: list[str]
+        dimension: str
+        *aliases, dimension = rest
+        assert all(isinstance(alias, lark.Token) for alias in aliases)
+        for i, alias in enumerate(aliases):
+            aliases[i] = str(alias)
+        dimension = str(dimension)
+
+        return DefineRootSymbolAliases(
+            unit=unit,
+            symbol=symbol,
+            aliases=aliases,
+            dimension=dimension,
+        )
 
     def define_derived_symbol_aliases(
         self,
