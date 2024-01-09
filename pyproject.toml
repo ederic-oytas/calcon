@@ -4,7 +4,23 @@ version = "0.1.1"
 description = "Calculator with physical quantities."
 authors = ["Ederic Oytas <edericoytas@gmail.com>"]
 license = "MIT"
+homepage = "https://github.com/ederic-oytas/calcon"
+repository = "https://github.com/ederic-oytas/calcon"
 readme = "README.md"
+keywords = [
+    "calculator",
+    "math",
+    "unit",
+    "quantity",
+    "dimension",
+    "physical quantity",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Typing :: Typed",
+]
 
 [tool.poetry.scripts]
 calcon = "calcon.main:app"
