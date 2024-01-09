@@ -5,11 +5,12 @@
 
 
 from decimal import Decimal
+from functools import cache
 from typing import Union
 from typer.testing import CliRunner
 
 import pytest
-from calcon.main import typer_app as main_app, default_app
+import calcon.main
 from calcon.app import Quantity
 from calcon.parsing import parse_expr
 
@@ -25,6 +26,21 @@ def u(**unit: Union[int, str]) -> dict[str, Decimal]:
 
 
 runner = CliRunner()
+
+
+@pytest.fixture(scope="session")
+def cached_default_app_function():
+    return cache(calcon.main.default_app)
+
+
+@pytest.fixture(scope="function")
+def cache_default_app_if_fast(
+    monkeypatch, cached_default_app_function, pytestconfig
+):
+    if pytestconfig.getoption("fast"):
+        monkeypatch.setattr(
+            calcon.main, "default_app", cached_default_app_function
+        )
 
 
 @pytest.mark.parametrize(
@@ -56,13 +72,15 @@ runner = CliRunner()
         ("86400s -> d", q(1, day=1)),
     ],
 )
-def test_successes(input_expr: str, expected_quantity: Quantity):
+def test_successes(
+    input_expr: str, expected_quantity: Quantity, cache_default_app_if_fast
+):
     """Tests successful invocations."""
-    result = runner.invoke(main_app, ["--", input_expr])
+    result = runner.invoke(calcon.main.typer_app, ["--", input_expr])
     output_str = result.stdout
     assert result.exit_code == 0
 
-    calcon_app = default_app()
+    calcon_app = calcon.main.default_app()
     output_expanded_expr_str, output_result_quantity_str = output_str.split(
         "="
     )
@@ -86,9 +104,9 @@ def test_successes(input_expr: str, expected_quantity: Quantity):
         "5 +",
     ],
 )
-def test_syntax_errors(input_expr: str):
+def test_syntax_errors(input_expr: str, cache_default_app_if_fast):
     """Tests invocations which result in a calculation error."""
-    result = runner.invoke(main_app, ["--", input_expr])
+    result = runner.invoke(calcon.main.typer_app, ["--", input_expr])
     result_stdout = result.stdout
     assert result.exit_code == 1
     assert "syntax error" in result_stdout.lower()
@@ -106,9 +124,9 @@ def test_syntax_errors(input_expr: str):
         "2^(5 * m)",  # non-dimensionless exponent
     ],
 )
-def test_calculation_errors(input_expr: str):
+def test_calculation_errors(input_expr: str, cache_default_app_if_fast):
     """Tests invocations which result in a calculation error."""
-    result = runner.invoke(main_app, ["--", input_expr])
+    result = runner.invoke(calcon.main.typer_app, ["--", input_expr])
     result_stdout = result.stdout
     assert result.exit_code == 2
     assert "calculation error" in result_stdout.lower()
