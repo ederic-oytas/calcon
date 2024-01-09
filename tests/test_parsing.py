@@ -1,5 +1,7 @@
 """Testing module for parsing.py"""
 
+import lark
+import pytest
 from calcon.expressions import Expression
 from calcon.parsing import parse_expr, parse_statements
 
@@ -37,6 +39,21 @@ def test_statements() -> None:
         """
     )
     assert len(statements) == 3
+
+    # Test unicode characters
+    assert len(parse_statements("1 angstrom (Å)  = 10e-10 m")) == 1
+    assert len(parse_statements("1 degree (°) = (pi/180) rad")) == 1
+    assert len(parse_statements("1 rankine (R) [°R, °Ra] = (5/9) K")) == 1
+    assert len(parse_statements("1 pi (π) = 3.14")) == 1
+
+    # Test that numbers in identifiers aren't valid
+
+    with pytest.raises(lark.LarkError):
+        parse_statements("1 dozen (12) = 12")
+    with pytest.raises(lark.LarkError):
+        parse_statements("1 square_meter (m2) = m^2")
+    with pytest.raises(lark.LarkError):
+        parse_statements("1 one_unit (1u) = unit")
 
 
 def test_expr() -> None:

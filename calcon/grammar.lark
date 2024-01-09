@@ -1,6 +1,7 @@
 
 UNSIGNED: /\d+(?:\.\d*)?|\.\d+'/
-IDENT: /[a-zA-Z_]+/
+IDENT: /([^0-9\W]|\u00B0)+/
+// \u00B0 : degree symbol
 _NEWLINE: NEWLINE
 
 ?stmtseq: _NEWLINE* (stmt (_NEWLINE+ stmt)*)? _NEWLINE*  -> statement_sequence
