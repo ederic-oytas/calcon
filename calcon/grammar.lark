@@ -29,5 +29,7 @@ _NEWLINE: NEWLINE
 
 %import common.WS_INLINE
 %import common.NEWLINE
+%import python.COMMENT
 
+%ignore COMMENT
 %ignore WS_INLINE
