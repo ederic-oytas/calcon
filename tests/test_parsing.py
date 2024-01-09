@@ -4,6 +4,7 @@ import lark
 import pytest
 from calcon.expressions import Expression
 from calcon.parsing import parse_expr, parse_statements
+from calcon.statements import Statement
 
 
 def test_statements() -> None:
@@ -14,9 +15,10 @@ def test_statements() -> None:
     assert len(parse_statements("1 liter (L) = 0.001 m^3")) == 1
     assert len(parse_statements("1 liter [litre] = 0.001 m^3")) == 1
     assert len(parse_statements("1 liter (L) [litre] = 0.001 m^3")) == 1
-    assert (
-        len(parse_statements("1 liter (L) [litre, litres] = 0.001 m^3")) == 1
-    )
+
+    statements = parse_statements("1 liter (L) [litre, litres] = 0.001 m^3")
+    assert len(statements) == 1
+    assert isinstance(statements[0], Statement)
 
     statements = parse_statements(
         """

@@ -3,6 +3,7 @@
 
 from abc import abstractmethod
 from dataclasses import dataclass
+from typing import Optional
 
 from calcon.app import App
 from calcon.expressions import Expression
@@ -29,14 +30,20 @@ class DefineRoot(Statement):
 
 
 @dataclass
-class DefineDerived(Statement):
+class DefineDerivedSymbolAliases(Statement):
     """Represents a statement which defines a derived unit."""
 
     unit: str
+    symbol: Optional[str]
+    aliases: list[str]
     value: Expression
 
     def execute(self, app: App, /) -> None:
         app.define_derived_unit(self.unit, self.value.evaluate(app))
+        if self.symbol is not None:
+            app.define_unit_alias(self.symbol, self.unit)
+        for alias in self.aliases:
+            app.define_unit_alias(alias, self.unit)
 
 
 @dataclass

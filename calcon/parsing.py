@@ -1,5 +1,6 @@
 """Module for parsing strings into parse trees."""
 
+from typing import Any, Optional
 import lark
 
 from calcon.expressions import (
@@ -15,7 +16,7 @@ from calcon.expressions import (
     Subtract,
     Unsigned,
 )
-from calcon.statements import DefineDerived, Statement
+from calcon.statements import DefineDerivedSymbolAliases, Statement
 
 _stmtseq_parser = lark.Lark.open_from_package(
     __name__, "grammar.lark", start="stmtseq"
@@ -53,8 +54,31 @@ class _Transformer(lark.Transformer):
     def statement_sequence(self, *statements: Statement):
         return statements
 
-    def define_derived(self, unit: lark.Token, expr: Expression) -> Statement:
-        return DefineDerived(str(unit), expr)
+    def define_derived_symbol_aliases(
+        self,
+        unit: str,
+        symbol: Optional[str],
+        *rest: Any,
+    ) -> Statement:
+        # converts lark.Token into strings
+        unit = str(unit)
+        if symbol is not None:
+            symbol = str(unit)
+
+        aliases: list[str]
+        value: Expression
+        *aliases, value = rest
+        assert all(isinstance(alias, lark.Token) for alias in aliases)
+        for i, alias in enumerate(aliases):
+            aliases[i] = str(alias)
+        assert isinstance(value, Expression)
+
+        return DefineDerivedSymbolAliases(
+            unit=unit,
+            symbol=symbol,
+            aliases=aliases,
+            value=value,
+        )
 
     convert = Convert
 
