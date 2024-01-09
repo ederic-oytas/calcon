@@ -9,7 +9,7 @@ from typing import Union
 from typer.testing import CliRunner
 
 import pytest
-from calcon.main import app as main_app, create_default_calcon_app
+from calcon.main import typer_app as main_app, default_app
 from calcon.app import Quantity
 from calcon.parsing import parse_expr
 
@@ -62,7 +62,7 @@ def test_successes(input_expr: str, expected_quantity: Quantity):
     output_str = result.stdout
     assert result.exit_code == 0
 
-    calcon_app = create_default_calcon_app()
+    calcon_app = default_app()
     output_expanded_expr_str, output_result_quantity_str = output_str.split(
         "="
     )

@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 [tool.poetry.scripts]
-calcon = "calcon.main:app"
+calcon = "calcon.main:typer_app"
 
 [tool.poetry.dependencies]
 python = "^3.9"

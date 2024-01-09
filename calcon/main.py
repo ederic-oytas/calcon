@@ -1,22 +1,21 @@
 """Module for the command-line interface."""
 
-from decimal import Decimal
 import importlib.resources
-from typing import Annotated, Union
+from typing import Annotated
 import lark
 import typer
 
-from calcon.app import App as CalconApp, Quantity
+from calcon.app import App
 from calcon.parsing import parse_expr, parse_statements
 
 
-app = typer.Typer()
+typer_app = typer.Typer()
 
 
-def create_default_calcon_app() -> CalconApp:
+def default_app() -> App:
     """Creates a default calcon app."""
 
-    calcon_app = CalconApp()
+    calcon_app = App()
     prelude_res = importlib.resources.files("calcon").joinpath(
         "prelude.calcon"
     )
@@ -28,7 +27,7 @@ def create_default_calcon_app() -> CalconApp:
     return calcon_app
 
 
-@app.command(no_args_is_help=True)
+@typer_app.command(no_args_is_help=True)
 def main(
     expr: Annotated[
         str,
@@ -41,11 +40,11 @@ def main(
 ) -> None:
     """Calculator app with physical quantities."""
 
-    calcon_app = create_default_calcon_app()
+    app = default_app()
 
     try:
         expr_obj = parse_expr(expr)
-        result = expr_obj.evaluate(calcon_app)
+        result = expr_obj.evaluate(app)
     except lark.LarkError as error:
         print("SYNTAX ERROR:")
         print(error)
@@ -61,5 +60,5 @@ def main(
     print()
     print(expr_obj.display_str())
     print()
-    print(f"  = {calcon_app.quantity_display_str(result)}")
+    print(f"  = {app.quantity_display_str(result)}")
     print()
