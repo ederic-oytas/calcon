@@ -12,10 +12,10 @@
 #
 # Syntax:
 #
-#     1 UNIT (SYMBOL) [ALIASES...] :: DIMENSION
+#     1 UNIT (SYMBOL_ALIAS) [ALIASES...] :: DIMENSION
 #
-# SYMBOL and ALIASES are both optional. ALIASES must contain at least one unit
-# when specified.
+# (SYMBOL_ALIAS) and [ALIASES...] are both optional. ALIASES must contain at
+# least one unit when specified.
 #
 
 1 meter (m) [metre] :: Length
@@ -34,10 +34,10 @@
 #
 # Syntax:
 #
-#     1 UNIT (SYMBOL) [ALIASES...] = VALUE
+#     1 UNIT (SYMBOL_ALIAS) [ALIASES...] = VALUE
 #
-# SYMBOL and ALIASES are both optional. ALIASES must contain at least one unit
-# when specified.
+# (SYMBOL_ALIAS) and [ALIASES...] are both optional. ALIASES must contain at
+# least one unit when specified.
 #
 
 # Pi up to 100 digits

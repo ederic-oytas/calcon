@@ -79,7 +79,7 @@ class _Transformer(lark.Transformer):
 
         return DefineRootSymbolAliases(
             unit=unit,
-            symbol=symbol,
+            symbol_alias=symbol,
             aliases=aliases,
             dimension=dimension,
         )

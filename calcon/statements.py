@@ -24,14 +24,14 @@ class DefineRootSymbolAliases(Statement):
     now, the symbol is treated as an alias.)"""
 
     unit: str
-    symbol: Optional[str]
+    symbol_alias: Optional[str]
     aliases: list[str]
     dimension: str
 
     def execute(self, app: App, /) -> None:
         app.define_root_unit(self.unit, self.dimension)
-        if self.symbol is not None:
-            app.define_unit_alias(self.symbol, self.unit)
+        if self.symbol_alias is not None:
+            app.define_unit_symbol_alias(self.symbol_alias, self.unit)
         for alias in self.aliases:
             app.define_unit_alias(alias, self.unit)
 
