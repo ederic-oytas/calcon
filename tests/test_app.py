@@ -34,6 +34,31 @@ class TestApp:
         with pytest.raises(ValueError):
             app.define_root_unit("d", "time")
 
+    def test_define_symbol_alias__symbol_already_defined(self) -> None:
+        """Tests that App.define_symbol_alias() raises `ValueError` when a
+        symbol is already defined for a unit."""
+        app = App()
+        app.define_root_unit("a", "length")
+        app.define_unit_symbol_alias("A1", "a")
+
+        with pytest.raises(ValueError):
+            app.define_unit_symbol_alias("A2", "a")
+
+    def test_quantity_display_str_shows_symbol(self) -> None:
+        """Tests that App.quantity_display_str() displays the symbols for the
+        units by default (if any)."""
+
+        app = App()
+        app.define_root_unit("a", "length")
+        app.define_unit_symbol_alias("A", "a")
+        app.define_root_unit("b", "time")
+
+        quantity = q(12, a=1, b=1)
+        display_str = app.quantity_display_str(quantity)
+        assert "a" not in display_str
+        assert "A" in display_str
+        assert "b" in display_str
+
     def test_define_methods_redefine_error(self) -> None:
         """Tests that a `ValueError` is raised for the define methods when
         a unit is attempted to be redefined."""
@@ -45,26 +70,18 @@ class TestApp:
         app.define_derived_unit("b", Q(D(2), {"a": D(1)}))
         app.define_unit_alias("c", "b")
         app.define_root_unit("d", "time")
+        app.define_unit_symbol_alias("D", "d")
 
         # Test ValueError raised when name is already taken
-        with pytest.raises(ValueError):
-            app.define_root_unit("a", "length")
-        with pytest.raises(ValueError):
-            app.define_root_unit("b", "length")
-        with pytest.raises(ValueError):
-            app.define_root_unit("c", "length")
-        with pytest.raises(ValueError):
-            app.define_derived_unit("a", Q(D(3), {}))
-        with pytest.raises(ValueError):
-            app.define_derived_unit("b", Q(D(3), {}))
-        with pytest.raises(ValueError):
-            app.define_derived_unit("c", Q(D(3), {}))
-        with pytest.raises(ValueError):
-            app.define_unit_alias("a", "d")
-        with pytest.raises(ValueError):
-            app.define_unit_alias("b", "d")
-        with pytest.raises(ValueError):
-            app.define_unit_alias("c", "d")
+        for unit in "abcdD":
+            with pytest.raises(ValueError):
+                app.define_root_unit(unit, "length")
+            with pytest.raises(ValueError):
+                app.define_derived_unit(unit, Q(D(3), {}))
+            with pytest.raises(ValueError):
+                app.define_unit_alias(unit, "d")
+            with pytest.raises(ValueError):
+                app.define_unit_symbol_alias(unit, "d")
 
     def test_quantity_from_magnitude_str(self) -> None:
         """Tests App.quantity_from_magnitude_str()"""

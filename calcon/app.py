@@ -46,6 +46,7 @@ class App:
         """Creates a new Calcon app object."""
         self._unit_definitions: dict[str, _UnitDefinition] = {}
         self._dimensions_to_units: dict[str, str] = {}
+        self._units_to_symbols: dict[str, str] = {}
 
     #
     # Definitions
@@ -94,6 +95,19 @@ class App:
         self._unit_definitions[alias] = _UnitAliasDefinition(
             canonical=canonical
         )
+
+    def define_unit_symbol_alias(self, symbol: str, canonical: str, /) -> None:
+        """Defines a symbol alias for a unit.
+
+        Raises `ValueError` if the symbol alias is already an alias for a unit,
+        or if the canonical unit already has a symbol defined for it.
+        """
+        self.define_unit_alias(symbol, canonical)
+        if canonical in self._units_to_symbols:
+            raise ValueError(
+                f"Unit {canonical} already has a symbol defined for it."
+            )
+        self._units_to_symbols[canonical] = symbol
 
     #
     # Unit operations
@@ -257,9 +271,10 @@ class App:
 
         factors = [str(x.magnitude)]
         for component, power in x.unit.items():
+            symbol = self._units_to_symbols.get(component, component)
             if power == 1:
-                factors.append(component)
+                factors.append(symbol)
             else:
-                factors.append(f"{component}^{power}")
+                factors.append(f"{symbol}^{power}")
 
-        return " * ".join(factors)
+        return " ".join(factors)
