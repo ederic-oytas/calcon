@@ -23,7 +23,7 @@ class Quantity:
     Each key can either be a `str` or a tuple of two `str`'s.
 
     - If it is a `str`, then it is a canonical core unit name.
-    
+
     - If it is a tuple, then the first element is a canonical prefix and the
       second element is a canonical unit name.
     """
@@ -53,6 +53,9 @@ class _PrefixDefinition:
     """Canonical name for this prefix unit."""
     value: Decimal
     """Value of this prefix."""
+    symbol: Optional[str] = None
+    """Symbol used for this unit. If it is `None`, then there is no symbol
+    set for this unit."""
 
 
 _ONE = Decimal(1)
@@ -73,7 +76,6 @@ class App:
         # self._dimensions_to_units: dict[str, str] = {}
         # self._units_to_symbols: dict[str, str] = {}
         self._prefix_definitions: dict[str, _PrefixDefinition] = {}
-        self._prefixes_to_symbols: dict[str, str] = {}
 
     #
     # Definitions
@@ -168,12 +170,15 @@ class App:
         Raises `ValueError` if a prefix is already defined or if a symbol has
         already been defined for the given prefix.
         """
-        self.define_prefix_alias(symbol, canonical)
-        if canonical in self._prefixes_to_symbols:
+
+        canon_defn = self._prefix_definitions[canonical]
+        if canon_defn.symbol is not None:
             raise ValueError(
                 f"A symbol has already been defined for the prefix {canonical}"
             )
-        self._prefixes_to_symbols[canonical] = symbol
+        self.define_prefix_alias(symbol, canonical)
+        self._prefix_definitions[symbol] = canon_defn
+        canon_defn.symbol = symbol
 
     #
     # Unit operations
@@ -349,7 +354,8 @@ class App:
             else:
                 assert isinstance(component, tuple)
                 prefix, core = component
-                prefix_symbol = self._prefixes_to_symbols.get(prefix, prefix)
+                prefix_defn = self._prefix_definitions[prefix]
+                prefix_symbol = prefix_defn.symbol or prefix
                 core_defn = self._core_definitions[core]
                 core_symbol = core_defn.symbol or core
                 symbol = f"{prefix_symbol}{core_symbol}"
