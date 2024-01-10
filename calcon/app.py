@@ -1,7 +1,7 @@
 """Module containing the App and Quantity class."""
 
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from decimal import Decimal
 from typing import Optional, Union
 
@@ -19,7 +19,7 @@ class Quantity:
     unit: _Unit
     """Dictionary mapping single units (components) to the power they are
     raised to.
-    
+
     Each key can either be a `str` or a tuple of two `str's`. If it is a `str`,
     then it is a canonical unit name. If it is a tuple, then the first element
     is a canonical prefix and the second element is a canonical unit name.
@@ -99,19 +99,6 @@ class App:
                 magnitude=value.magnitude * value_unit_root_value.magnitude,
                 unit=value_unit_root_value.unit,
             ),
-        )
-        return
-
-        if unit in self._unit_definitions:
-            raise ValueError(f"Unit {unit!r} is already defined.")
-
-        value_unit_root_value = self._unit_root_value(value.unit)
-
-        self._unit_definitions[unit] = _DerivedUnitDefinition(
-            root_value=Quantity(
-                magnitude=value.magnitude * value_unit_root_value.magnitude,
-                unit=value_unit_root_value.unit,
-            )
         )
 
     def define_core_unit_alias(self, alias: str, unit: str, /) -> None:
