@@ -107,13 +107,9 @@ class App:
         if unit in self._core_definitions:
             raise ValueError(f"Unit {unit} is already defined.")
 
-        value_unit_root_value = self._unit_root_value(value.unit)
         self._core_definitions[unit] = _CoreUnitDefinition(
             canonical=unit,
-            root_value=Quantity(
-                magnitude=value.magnitude * value_unit_root_value.magnitude,
-                unit=value_unit_root_value.unit,
-            ),
+            root_value=self.quantity_convert_to_root_units(value),
         )
 
     def define_core_unit_alias(self, alias: str, unit: str, /) -> None:
