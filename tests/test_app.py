@@ -27,7 +27,9 @@ def u(**unit: Union[int, str]) -> _Unit:
 class TestApp:
     """Tests the App class."""
 
-    def define_root_unit__dimension_already_associated_error(self) -> None:
+    def test_define_root_unit__dimension_already_associated_error(
+        self,
+    ) -> None:
         """Tests that App.define_root_unit() raises ValueError if the
         dimension is already associated to a unit."""
 
