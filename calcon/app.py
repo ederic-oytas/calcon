@@ -185,12 +185,25 @@ class App:
 
         Raises `ValueError` if the unit doesn't exist.
         """
-        try:
-            canon = self._core_definitions[unit].canonical
+        # Check if it exists as a unit itself.
+        if core_defn := self._core_definitions.get(unit):
+            canon = core_defn.canonical
             return {canon: Decimal(1)}
 
-        except KeyError:
-            raise ValueError(f"Unknown unit {unit!r}") from None
+        # Otherwise, see if the first part of the unit is a prefix and the
+        # second part is a valid unit
+        for i in range(1, len(unit)):
+            prefix = unit[:i]
+            core = unit[i:]
+            if (prefix_defn := self._prefix_definitions.get(prefix)) and (
+                core_defn := self._core_definitions.get(core)
+            ):
+                prefix_canon = prefix_defn.canonical
+                core_canon = core_defn.canonical
+                return {(prefix_canon, core_canon): Decimal(1)}
+
+        # If that all fails, then raise an error.
+        raise ValueError(f"Unknown unit {unit!r}") from None
 
     def _unit_multiply_power_in_place(
         self,

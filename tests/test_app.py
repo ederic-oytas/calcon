@@ -190,6 +190,30 @@ class TestApp:
         with pytest.raises(ValueError):
             f("m")
 
+    def test_quantity_from_unit_name_with_prefixes(self) -> None:
+        """Tests App.quantity_from_unit_name()"""
+
+        app = App()
+        f = app.quantity_from_unit_name
+
+        app.define_root_unit("meter", "Length")
+        app.define_core_unit_symbol_alias("m", "meter")
+        app.define_core_unit_alias("metre", "meter")
+        app.define_canonical_prefix("kilo", Decimal(1000))
+        app.define_prefix_symbol_alias("k", "kilo")
+        app.define_prefix_alias("K", "k")
+
+        x = q(1, {("kilo", "meter"): 1})
+        assert f("kilometer") == x
+        assert f("kilom") == x
+        assert f("kilometre") == x
+        assert f("kmeter") == x
+        assert f("km") == x
+        assert f("kmetre") == x
+        assert f("Kmeter") == x
+        assert f("Km") == x
+        assert f("Kmetre") == x
+
     def test_quantity_convert_to_root_units(self) -> None:
         app = App()
         app.define_root_unit("i", "Length")
