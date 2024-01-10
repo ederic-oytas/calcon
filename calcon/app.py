@@ -359,10 +359,14 @@ class App:
                 assert isinstance(component, tuple)
                 prefix, core = component
                 prefix_defn = self._prefix_definitions[prefix]
-                prefix_symbol = prefix_defn.symbol or prefix
                 core_defn = self._core_definitions[core]
-                core_symbol = core_defn.symbol or core
-                symbol = f"{prefix_symbol}{core_symbol}"
+                if (
+                    prefix_defn.symbol is not None
+                    and core_defn.symbol is not None
+                ):
+                    symbol = f"{prefix_defn.symbol}{core_defn.symbol}"
+                else:
+                    symbol = f"{prefix_defn.canonical}{core_defn.canonical}"
 
             if power == 1:
                 factors.append(symbol)

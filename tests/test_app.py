@@ -438,3 +438,39 @@ class TestApp:
         for a in equivalent:
             for b in equivalent:
                 assert app.quantity_convert(a, b.unit) == b
+
+    def test_quantity_display_str_with_prefixes(self) -> None:
+        # Note: if no symbol is defined for either the core unit or prefix,
+        # then the canonical name should be displayed.
+
+        app0 = App()
+        app0.define_root_unit("meter", "Length")
+        app0.define_canonical_prefix("kilo", Decimal(1000))
+
+        app1 = App()
+        app1.define_root_unit("meter", "Length")
+        app1.define_canonical_prefix("kilo", Decimal(1000))
+        app1.define_core_unit_symbol_alias("m", "meter")
+
+        app2 = App()
+        app2.define_root_unit("meter", "Length")
+        app2.define_canonical_prefix("kilo", Decimal(1000))
+        app2.define_prefix_symbol_alias("k", "kilo")
+
+        app3 = App()
+        app3.define_root_unit("meter", "Length")
+        app3.define_canonical_prefix("kilo", Decimal(1000))
+        app3.define_core_unit_symbol_alias("m", "meter")
+        app3.define_prefix_symbol_alias("k", "kilo")
+
+        apps = [app0, app1, app2, app3]
+
+        for i in range(0, 3):
+            app = apps[i]
+            s = app.quantity_display_str(q(12, {("kilo", "meter"): 3}))
+            assert "kilometer" in s
+            assert "3" in s
+
+        s = app3.quantity_display_str(q(12, {("kilo", "meter"): 3}))
+        assert "km" in s
+        assert "3" in s
