@@ -1,9 +1,9 @@
 """Module containing the App and Quantity class."""
 
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Union
+from typing import Optional, Union
 
 
 _Unit = dict[Union[str, tuple[str, str]], Decimal]
@@ -27,29 +27,12 @@ class Quantity:
 
 
 @dataclass
-class _UnitDefinition:
-    """Base class for all unit definition dataclasses."""
-
-
-@dataclass
-class _RootUnitDefinition(_UnitDefinition):
-    """Defines a root unit."""
-
-    dimension: str
-
-
-@dataclass
-class _DerivedUnitDefinition(_UnitDefinition):
-    """Defines a unit derived from a root unit."""
-
-    root_value: Quantity
-
-
-@dataclass
-class _UnitAliasDefinition(_UnitDefinition):
-    """Defines an alias for another unit."""
+class _CoreUnitDefinition:
+    """Defines a core unit (a non-prefixed unit)."""
 
     canonical: str
+    root_value: Quantity
+    symbol: Optional[str] = None
 
 
 @dataclass
@@ -71,14 +54,22 @@ class _PrefixAliasDefinition(_PrefixDefinition):
     canonical: str
 
 
+_ONE = Decimal(1)
+
+
 class App:
     """Represents a Calcon app."""
 
     def __init__(self, /) -> None:
         """Creates a new Calcon app object."""
-        self._unit_definitions: dict[str, _UnitDefinition] = {}
-        self._dimensions_to_units: dict[str, str] = {}
-        self._units_to_symbols: dict[str, str] = {}
+        self._core_definitions: dict[str, _CoreUnitDefinition] = {}
+        """Maps core unit names (including aliases) to definitions."""
+        self._dimensions_to_root_units: dict[str, str] = {}
+        """Maps dimensions to root units."""
+
+        # self._unit_definitions: dict[str, _UnitDefinition] = {}
+        # self._dimensions_to_units: dict[str, str] = {}
+        # self._units_to_symbols: dict[str, str] = {}
         self._prefix_definitions: dict[str, _PrefixDefinition] = {}
         self._prefixes_to_symbols: dict[str, str] = {}
 
@@ -92,21 +83,36 @@ class App:
         Raises `ValueError` if `unit` is already defined or if `dimension` is
         already associated to a root unit.
         """
-        if unit in self._unit_definitions:
-            raise ValueError(f"Unit {unit!r} is already defined.")
-        if dimension in self._dimensions_to_units:
+        if unit in self._core_definitions:
+            raise ValueError(f"Unit {unit} is already defined.")
+        if dimension in self._dimensions_to_root_units:
             raise ValueError(
-                f"Dimension {dimension!r} is already associated to a root "
-                "unit."
+                f"Dimension {dimension} is already associated to a root unit."
             )
-        self._unit_definitions[unit] = _RootUnitDefinition(dimension=dimension)
-        self._dimensions_to_units[dimension] = unit
+        self._core_definitions[unit] = _CoreUnitDefinition(
+            canonical=unit,
+            root_value=Quantity(_ONE, {unit: _ONE}),
+        )
+        self._dimensions_to_root_units[dimension] = unit
 
     def define_derived_unit(self, unit: str, value: Quantity, /) -> None:
         """Defines a unit derived in terms of a root unit.
 
         Raises `ValueError` if `unit` is already defined.
         """
+        if unit in self._core_definitions:
+            raise ValueError(f"Unit {unit} is already defined.")
+
+        value_unit_root_value = self._unit_root_value(value.unit)
+        self._core_definitions[unit] = _CoreUnitDefinition(
+            canonical=unit,
+            root_value=Quantity(
+                magnitude=value.magnitude * value_unit_root_value.magnitude,
+                unit=value_unit_root_value.unit,
+            ),
+        )
+        return
+
         if unit in self._unit_definitions:
             raise ValueError(f"Unit {unit!r} is already defined.")
 
@@ -124,11 +130,10 @@ class App:
 
         Raises `ValueError` if `alias` is already defined.
         """
-        if alias in self._unit_definitions:
-            raise ValueError(f"Unit {alias!r} is already defined.")
-        self._unit_definitions[alias] = _UnitAliasDefinition(
-            canonical=canonical
-        )
+        if alias in self._core_definitions:
+            raise ValueError(f"Unit {alias} is already defined.")
+        canon_defn = self._core_definitions[canonical]
+        self._core_definitions[alias] = canon_defn
 
     def define_unit_symbol_alias(self, symbol: str, canonical: str, /) -> None:
         """Defines a symbol alias for a unit.
@@ -136,12 +141,13 @@ class App:
         Raises `ValueError` if the symbol alias is already an alias for a unit,
         or if the canonical unit already has a symbol defined for it.
         """
-        self.define_unit_alias(symbol, canonical)
-        if canonical in self._units_to_symbols:
+        defn = self._core_definitions[canonical]
+        if defn.symbol is not None:
             raise ValueError(
                 f"Unit {canonical} already has a symbol defined for it."
             )
-        self._units_to_symbols[canonical] = symbol
+        self.define_unit_alias(symbol, canonical)
+        defn.symbol = symbol
 
     def define_canonical_prefix(self, prefix: str, value: Decimal, /) -> None:
         """Defines a canonical unit prefix.
@@ -182,22 +188,17 @@ class App:
     # Unit operations
     #
 
-    def _unit_lookup(self, unit_name: str, /) -> _Unit:
+    def _unit_lookup(self, unit: str, /) -> _Unit:
         """Looks up a unit by its name and returns it.
 
         Raises `ValueError` if the unit doesn't exist.
         """
         try:
-            definition = self._unit_definitions[unit_name]
-            if isinstance(definition, _UnitAliasDefinition):
-                return {definition.canonical: Decimal(1)}
-            assert isinstance(
-                definition, (_RootUnitDefinition, _DerivedUnitDefinition)
-            )
-            return {unit_name: Decimal(1)}
+            canon = self._core_definitions[unit].canonical
+            return {canon: Decimal(1)}
 
         except KeyError:
-            raise ValueError(f"Unknown unit {unit_name!r}") from None
+            raise ValueError(f"Unknown unit {unit!r}") from None
 
     def _unit_multiply_power_in_place(
         self,
@@ -230,21 +231,11 @@ class App:
                 prefix, core = component
                 prefix_value = self._prefix_value(prefix)
 
-            core_definition = self._unit_definitions[core]
-
-            # If component is a root unit, then just multiply the unit
-            if isinstance(core_definition, _RootUnitDefinition):
-                self._unit_multiply_power_in_place(
-                    root_unit, {core: power}, Decimal(1)
-                )
-                continue
-
-            # Multiply the term
-            assert isinstance(core_definition, _DerivedUnitDefinition)
+            core_defn = self._core_definitions[core]
             root_magnitude *= prefix_value
-            root_magnitude *= core_definition.root_value.magnitude
+            root_magnitude *= core_defn.root_value.magnitude
             self._unit_multiply_power_in_place(
-                root_unit, core_definition.root_value.unit, power
+                root_unit, core_defn.root_value.unit, power
             )
 
         return Quantity(root_magnitude, root_unit)
@@ -367,12 +358,14 @@ class App:
         for component, power in x.unit.items():
             symbol: str
             if isinstance(component, str):
-                symbol = self._units_to_symbols.get(component, component)
+                defn = self._core_definitions[component]
+                symbol = defn.symbol or component
             else:
                 assert isinstance(component, tuple)
                 prefix, core = component
                 prefix_symbol = self._prefixes_to_symbols.get(prefix, prefix)
-                core_symbol = self._units_to_symbols.get(core, core)
+                core_defn = self._core_definitions[core]
+                core_symbol = core_defn.symbol or core
                 symbol = f"{prefix_symbol}{core_symbol}"
 
             if power == 1:

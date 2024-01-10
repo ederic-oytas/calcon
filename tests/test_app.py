@@ -345,6 +345,10 @@ class TestApp:
 
         app = App()
         f = app.quantity_display_str
+        app.define_root_unit("gram", "Mass")
+        app.define_root_unit("meter", "Length")
+        app.define_root_unit("second", "Time")
+        app.define_derived_unit("kilogram", q(1000, gram=1))
 
         # Tests shouldn't be too strict. This is mainly for sanity tests and
         # test coverage (this file should completely cover app.py).
