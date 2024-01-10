@@ -44,6 +44,17 @@ class TestApp:
         with pytest.raises(ValueError):
             app.define_root_unit("b", "time")
 
+    def test_define_core_unit_alias__unit_not_defined_error(self) -> None:
+        app = App()
+        app.define_root_unit("a", "Length")
+
+        with pytest.raises(ValueError):
+            app.define_core_unit_alias("c", "b")
+        with pytest.raises(ValueError):
+            app.define_core_unit_alias("d", "c")
+        app.define_core_unit_alias("b", "a")
+        app.define_core_unit_alias("c", "b")
+
     def test_define_symbol_alias__symbol_already_defined(self) -> None:
         """Tests that App.define_symbol_alias() raises `ValueError` when a
         symbol is already defined for a unit."""
