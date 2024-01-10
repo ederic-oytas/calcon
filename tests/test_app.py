@@ -73,7 +73,7 @@ class TestApp:
 
         app = App()
         app.define_root_unit("a", "length")
-        app.define_derived_unit("b", Q(D(2), {"a": D(1)}))
+        app.define_derived_core_unit("b", Q(D(2), {"a": D(1)}))
         app.define_unit_alias("c", "b")
         app.define_root_unit("d", "time")
         app.define_unit_symbol_alias("D", "d")
@@ -83,7 +83,7 @@ class TestApp:
             with pytest.raises(ValueError):
                 app.define_root_unit(unit, "length")
             with pytest.raises(ValueError):
-                app.define_derived_unit(unit, Q(D(3), {}))
+                app.define_derived_core_unit(unit, Q(D(3), {}))
             with pytest.raises(ValueError):
                 app.define_unit_alias(unit, "d")
             with pytest.raises(ValueError):
@@ -139,7 +139,7 @@ class TestApp:
         f = app.quantity_from_unit_name
 
         app.define_root_unit("meter", "length")
-        app.define_derived_unit(
+        app.define_derived_core_unit(
             "yard", Quantity(Decimal("0.9144"), {"meter": Decimal(1)})
         )
         app.define_unit_alias("yard_alias", "yard")
@@ -159,24 +159,24 @@ class TestApp:
         # Define apps (all have equivalent unit systems)
         app1 = App()
         app1.define_root_unit("second", "time")
-        app1.define_derived_unit("minute", q(60, second=1))
-        app1.define_derived_unit("hour", q(60, minute=1))
-        app1.define_derived_unit("day", q(24, hour=1))
-        app1.define_derived_unit("week", q(7, day=1))
+        app1.define_derived_core_unit("minute", q(60, second=1))
+        app1.define_derived_core_unit("hour", q(60, minute=1))
+        app1.define_derived_core_unit("day", q(24, hour=1))
+        app1.define_derived_core_unit("week", q(7, day=1))
 
         app2 = App()
         app2.define_root_unit("second", "time")
-        app2.define_derived_unit("minute", q(60, second=1))
-        app2.define_derived_unit("hour", q(3600, second=1))
-        app2.define_derived_unit("day", q(86400, second=1))
-        app2.define_derived_unit("week", q(604800, second=1))
+        app2.define_derived_core_unit("minute", q(60, second=1))
+        app2.define_derived_core_unit("hour", q(3600, second=1))
+        app2.define_derived_core_unit("day", q(86400, second=1))
+        app2.define_derived_core_unit("week", q(604800, second=1))
 
         app3 = App()
         app3.define_root_unit("second", "time")
-        app3.define_derived_unit("minute", q(60, second=1))
-        app3.define_derived_unit("hour", q(60, minute=1))
-        app3.define_derived_unit("day", q(86400, second=1))
-        app3.define_derived_unit("week", q(7, day=1))
+        app3.define_derived_core_unit("minute", q(60, second=1))
+        app3.define_derived_core_unit("hour", q(60, minute=1))
+        app3.define_derived_core_unit("day", q(86400, second=1))
+        app3.define_derived_core_unit("week", q(7, day=1))
 
         equivalent = [
             q(1, week=1),
@@ -197,13 +197,15 @@ class TestApp:
 
         app = App()
         app.define_root_unit("gram", "mass")
-        app.define_derived_unit("kilogram", q(1000, gram=1))
+        app.define_derived_core_unit("kilogram", q(1000, gram=1))
         app.define_root_unit("meter", "length")
         app.define_root_unit("second", "time")
-        app.define_derived_unit(
+        app.define_derived_core_unit(
             "pascal", q(1, kilogram=1, meter=-1, second=-2)
         )
-        app.define_derived_unit("standard_atmosphere", q(101_325, pascal=1))
+        app.define_derived_core_unit(
+            "standard_atmosphere", q(101_325, pascal=1)
+        )
 
         equivalent: list[Quantity] = [
             q(3, standard_atmosphere=1),
@@ -217,7 +219,7 @@ class TestApp:
     def test_quantity_convert__different_dimensions(self) -> None:
         app = App()
         app.define_root_unit("second", "time")
-        app.define_derived_unit("minute", q(60, second=1))
+        app.define_derived_core_unit("minute", q(60, second=1))
         app.define_root_unit("gram", "mass")
 
         with pytest.raises(ValueError):
@@ -250,7 +252,7 @@ class TestApp:
         """Tests App.quantity_add()"""
         app = App()
         app.define_root_unit("second", "time")
-        app.define_derived_unit("minute", q(60, second=1))
+        app.define_derived_core_unit("minute", q(60, second=1))
         app.define_root_unit("meter", "length")
 
         f = app.quantity_add
@@ -270,7 +272,7 @@ class TestApp:
         """Tests App.quantity_subtract()"""
         app = App()
         app.define_root_unit("second", "time")
-        app.define_derived_unit("minute", q(60, second=1))
+        app.define_derived_core_unit("minute", q(60, second=1))
         app.define_root_unit("meter", "length")
 
         f = app.quantity_subtract
@@ -290,7 +292,7 @@ class TestApp:
         """Tests App.quantity_multiply()"""
         app = App()
         app.define_root_unit("second", "time")
-        app.define_derived_unit("minute", q(60, second=1))
+        app.define_derived_core_unit("minute", q(60, second=1))
         app.define_root_unit("meter", "length")
 
         f = app.quantity_multiply
@@ -304,7 +306,7 @@ class TestApp:
         """Tests App.quantity_divide()"""
         app = App()
         app.define_root_unit("second", "time")
-        app.define_derived_unit("minute", q(60, second=1))
+        app.define_derived_core_unit("minute", q(60, second=1))
         app.define_root_unit("meter", "length")
 
         f = app.quantity_divide
@@ -325,7 +327,7 @@ class TestApp:
 
         app = App()
         app.define_root_unit("meter", "length")
-        app.define_derived_unit("dozen", q(12))
+        app.define_derived_core_unit("dozen", q(12))
 
         f = app.quantity_exponentiate
 
@@ -348,7 +350,7 @@ class TestApp:
         app.define_root_unit("gram", "Mass")
         app.define_root_unit("meter", "Length")
         app.define_root_unit("second", "Time")
-        app.define_derived_unit("kilogram", q(1000, gram=1))
+        app.define_derived_core_unit("kilogram", q(1000, gram=1))
 
         # Tests shouldn't be too strict. This is mainly for sanity tests and
         # test coverage (this file should completely cover app.py).

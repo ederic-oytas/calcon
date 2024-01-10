@@ -84,8 +84,8 @@ class App:
         )
         self._dimensions_to_root_units[dimension] = unit
 
-    def define_derived_unit(self, unit: str, value: Quantity, /) -> None:
-        """Defines a unit derived in terms of a root unit.
+    def define_derived_core_unit(self, unit: str, value: Quantity, /) -> None:
+        """Defines a core unit derived from another unit.
 
         Raises `ValueError` if `unit` is already defined.
         """

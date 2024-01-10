@@ -47,7 +47,7 @@ class DefineDerivedSymbolAliases(Statement):
     value: Expression
 
     def execute(self, app: App, /) -> None:
-        app.define_derived_unit(self.unit, self.value.evaluate(app))
+        app.define_derived_core_unit(self.unit, self.value.evaluate(app))
         if self.symbol is not None:
             app.define_unit_alias(self.symbol, self.unit)
         for alias in self.aliases:
