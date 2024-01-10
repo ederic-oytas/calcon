@@ -33,3 +33,15 @@ be supported in the future.
 - Added this changelog
 
 - Fixed parsing numbers with leading period (`.`)
+
+### 0.2.0
+
+- Added adjacent multiplication (e.g. `5 meters` vs. `5 * meters`)
+
+- Added E notation (e.g. `3.43E+2 m/s`, which equals `343 m/s`)
+
+- Added support for single underscores in numbers (e.g. `1_000` or `1_000_000`)
+
+- Added comments (Python-style) (e.g. `5 meters  # this is a comment`)
+
+- Added more units
