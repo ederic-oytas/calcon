@@ -18,7 +18,10 @@ from calcon.parsing import parse_expr
 def q(magnitude: Union[int, str], /, **unit: Union[int, str]) -> Quantity:
     """Helper function to create a quantity, automatically converting the
     integers/strings to Decimal objects."""
-    return Quantity(Decimal(magnitude), u(**unit))
+    return Quantity(
+        Decimal(magnitude),
+        {c: Decimal(p) for c, p in unit.items()},
+    )
 
 
 def u(**unit: Union[int, str]) -> dict[str, Decimal]:

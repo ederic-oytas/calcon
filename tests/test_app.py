@@ -8,13 +8,19 @@ import pytest
 from calcon.app import App, Quantity
 
 
+_Unit = dict[Union[str, tuple[str, str]], Decimal]
+
+
 def q(magnitude: Union[int, str], /, **unit: Union[int, str]) -> Quantity:
     """Helper function to create a quantity, automatically converting the
     integers/strings to Decimal objects."""
-    return Quantity(Decimal(magnitude), u(**unit))
+    return Quantity(
+        Decimal(magnitude),
+        {c: Decimal(p) for c, p in unit.items()},
+    )
 
 
-def u(**unit: Union[int, str]) -> dict[str, Decimal]:
+def u(**unit: Union[int, str]) -> _Unit:
     return {c: Decimal(p) for c, p in unit.items()}
 
 

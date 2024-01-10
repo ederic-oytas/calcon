@@ -6,7 +6,7 @@ from decimal import Decimal
 from typing import Union
 
 
-_Unit = dict[str, Decimal]
+_Unit = dict[Union[str, tuple[str, str]], Decimal]
 
 
 @dataclass
@@ -211,23 +211,48 @@ class App:
         root_magnitude = Decimal(1)
         root_unit: _Unit = {}
         for component, power in unit.items():
-            definition = self._unit_definitions[component]
+            prefix_value: Decimal
+            core: str
+            if isinstance(component, str):
+                prefix_value = Decimal(1)
+                core = component
+            else:
+                assert isinstance(component, tuple)
+                prefix, core = component
+                prefix_value = self._prefix_value(prefix)
+
+            core_definition = self._unit_definitions[core]
 
             # If component is a root unit, then just multiply the unit
-            if isinstance(definition, _RootUnitDefinition):
+            if isinstance(core_definition, _RootUnitDefinition):
                 self._unit_multiply_power_in_place(
-                    root_unit, {component: power}, Decimal(1)
+                    root_unit, {core: power}, Decimal(1)
                 )
                 continue
 
             # Multiply the term
-            assert isinstance(definition, _DerivedUnitDefinition)
-            root_magnitude *= definition.root_value.magnitude
+            assert isinstance(core_definition, _DerivedUnitDefinition)
+            root_magnitude *= prefix_value
+            root_magnitude *= core_definition.root_value.magnitude
             self._unit_multiply_power_in_place(
-                root_unit, definition.root_value.unit, power
+                root_unit, core_definition.root_value.unit, power
             )
 
         return Quantity(root_magnitude, root_unit)
+
+    #
+    # Prefix operations
+    #
+
+    def _prefix_value(self, prefix: str) -> Decimal:
+        """Returns the value of a prefix."""
+        definition = self._prefix_definitions[prefix]
+        if isinstance(definition, _CanonicalPrefixDefinition):
+            return definition.value
+        assert isinstance(definition, _PrefixAliasDefinition)
+        canonical_definition = self._prefix_definitions[prefix]
+        assert isinstance(canonical_definition, _CanonicalPrefixDefinition)
+        return canonical_definition.value
 
     #
     # Quantity operations
@@ -331,7 +356,16 @@ class App:
 
         factors = [str(x.magnitude)]
         for component, power in x.unit.items():
-            symbol = self._units_to_symbols.get(component, component)
+            symbol: str
+            if isinstance(component, str):
+                symbol = self._units_to_symbols.get(component, component)
+            else:
+                assert isinstance(component, tuple)
+                prefix, core = component
+                prefix_symbol = self._prefixes_to_symbols.get(prefix, prefix)
+                core_symbol = self._units_to_symbols.get(core, core)
+                symbol = f"{prefix_symbol}{core_symbol}"
+
             if power == 1:
                 factors.append(symbol)
             else:
