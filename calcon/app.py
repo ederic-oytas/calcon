@@ -39,19 +39,8 @@ class _CoreUnitDefinition:
 class _PrefixDefinition:
     """Defines a unit prefix."""
 
-
-@dataclass
-class _CanonicalPrefixDefinition(_PrefixDefinition):
-    """Defines a canonical prefix."""
-
-    value: Decimal
-
-
-@dataclass
-class _PrefixAliasDefinition(_PrefixDefinition):
-    """Defines a prefix alias."""
-
     canonical: str
+    value: Decimal
 
 
 _ONE = Decimal(1)
@@ -156,8 +145,9 @@ class App:
         """
         if prefix in self._prefix_definitions:
             raise ValueError(f"Prefix {prefix} is already defined.")
-        self._prefix_definitions[prefix] = _CanonicalPrefixDefinition(
-            value=value
+        self._prefix_definitions[prefix] = _PrefixDefinition(
+            canonical=prefix,
+            value=value,
         )
 
     def define_prefix_alias(self, alias: str, canonical: str, /) -> None:
@@ -167,9 +157,8 @@ class App:
         """
         if alias in self._prefix_definitions:
             raise ValueError(f"Prefix {alias} is already defined.")
-        self._prefix_definitions[alias] = _PrefixAliasDefinition(
-            canonical=canonical
-        )
+        canon_defn = self._prefix_definitions[canonical]
+        self._prefix_definitions[alias] = canon_defn
 
     def define_prefix_symbol_alias(self, symbol: str, canonical: str) -> None:
         """Defines a prefix alias.
@@ -246,13 +235,8 @@ class App:
 
     def _prefix_value(self, prefix: str) -> Decimal:
         """Returns the value of a prefix."""
-        definition = self._prefix_definitions[prefix]
-        if isinstance(definition, _CanonicalPrefixDefinition):
-            return definition.value
-        assert isinstance(definition, _PrefixAliasDefinition)
-        canonical_definition = self._prefix_definitions[prefix]
-        assert isinstance(canonical_definition, _CanonicalPrefixDefinition)
-        return canonical_definition.value
+        defn = self._prefix_definitions[prefix]
+        return defn.value
 
     #
     # Quantity operations
