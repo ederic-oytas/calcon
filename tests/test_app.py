@@ -27,9 +27,9 @@ def u(**unit: Union[int, str]) -> _Unit:
 class TestApp:
     """Tests the App class."""
 
-    def test_define_root__unit_dimension_already_associated(self) -> None:
-        """Tests that App.define_root_unit() raises `ValueError` when another
-        unit is already associated with the given dimension."""
+    def define_root_unit__dimension_already_associated_error(self) -> None:
+        """Tests that App.define_root_unit() raises ValueError if the
+        dimension is already associated to a unit."""
 
         app = App()
         app.define_root_unit("a", "length")
@@ -39,6 +39,8 @@ class TestApp:
             app.define_root_unit("c", "length")
         with pytest.raises(ValueError):
             app.define_root_unit("d", "time")
+        with pytest.raises(ValueError):
+            app.define_root_unit("b", "time")
 
     def test_define_symbol_alias__symbol_already_defined(self) -> None:
         """Tests that App.define_symbol_alias() raises `ValueError` when a
