@@ -2,7 +2,7 @@
 
 
 from decimal import Decimal
-from typing import Union
+from typing import Optional, Union
 
 import pytest
 from calcon.app import App, Quantity
@@ -11,16 +11,30 @@ from calcon.app import App, Quantity
 _Unit = dict[Union[str, tuple[str, str]], Decimal]
 
 
-def q(magnitude: Union[int, str], /, **unit: Union[int, str]) -> Quantity:
+def q(
+    magnitude: Union[int, str],
+    unit1: Optional[dict[Union[str, tuple[str, str]], Union[int, str]]] = None,
+    /,
+    **unit2: Union[int, str],
+) -> Quantity:
     """Helper function to create a quantity, automatically converting the
     integers/strings to Decimal objects."""
+    if unit1 is None:
+        unit1 = {}
+    unit = unit1 | unit2
     return Quantity(
         Decimal(magnitude),
         {c: Decimal(p) for c, p in unit.items()},
     )
 
 
-def u(**unit: Union[int, str]) -> _Unit:
+def u(
+    unit1: Optional[dict[Union[str, tuple[str, str]], Union[int, str]]] = None,
+    **unit2: Union[int, str],
+) -> _Unit:
+    if unit1 is None:
+        unit1 = {}
+    unit = unit1 | unit2
     return {c: Decimal(p) for c, p in unit.items()}
 
 
@@ -398,3 +412,29 @@ class TestApp:
         assert "kilogram" in s
         assert "meter" in s
         assert "second" in s
+
+    def test_quantity_convert_with_prefixes(self) -> None:
+        app = App()
+        app.define_root_unit("meter", "Length")
+        app.define_canonical_prefix("kilo", Decimal(1000))
+        app.define_canonical_prefix("milli", Decimal("0.001"))
+
+        f = app.quantity_convert
+
+        equivalent = [
+            q(12, {("kilo", "meter"): 1}),
+            q(12_000, {"meter": 1}),
+            q(12_000_000, {("milli", "meter"): 1}),
+        ]
+        for a in equivalent:
+            for b in equivalent:
+                assert app.quantity_convert(a, b.unit) == b
+
+        equivalent = [
+            q("12", {("kilo", "meter"): 3}),
+            q("12e9", {"meter": 3}),
+            q("12e18", {("milli", "meter"): 3}),
+        ]
+        for a in equivalent:
+            for b in equivalent:
+                assert app.quantity_convert(a, b.unit) == b
