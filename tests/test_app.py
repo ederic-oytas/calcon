@@ -163,6 +163,17 @@ class TestApp:
         with pytest.raises(ValueError):
             f("m")
 
+    def test_quantity_convert_to_root_units(self) -> None:
+        app = App()
+        app.define_root_unit("i", "Length")
+        app.define_derived_core_unit("v", q(5, i=1))
+        app.define_derived_core_unit("x", q(10, i=1))
+
+        f = app.quantity_convert_to_root_units
+        assert f(q(12, i=1)) == q(12, i=1)
+        assert f(q(12, v=1)) == q(60, i=1)
+        assert f(q(12, x=1)) == q(120, i=1)
+
     def test_quantity_convert__time(self) -> None:
         """Tests App.quantity_convert_to_same_unit() with time units"""
 

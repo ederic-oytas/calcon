@@ -287,6 +287,14 @@ class App:
             unit=target_unit,
         )
 
+    def quantity_convert_to_root_units(self, quantity: Quantity) -> Quantity:
+        """Converts the given quantity to root units and returns it."""
+        unit_root_value = self._unit_root_value(quantity.unit)
+        return Quantity(
+            magnitude=quantity.magnitude * unit_root_value.magnitude,
+            unit=unit_root_value.unit,
+        )
+
     def quantity_negate(self, quantity: Quantity, /) -> Quantity:
         """Negates the given quantity and returns the result."""
         return Quantity(-quantity.magnitude, quantity.unit)
