@@ -14,7 +14,16 @@ class Quantity:
     """Represents a physical quantity."""
 
     magnitude: Decimal
+    """Magnitude of this quantity."""
+
     unit: _Unit
+    """Dictionary mapping single units (components) to the power they are
+    raised to.
+    
+    Each key can either be a `str` or a tuple of two `str's`. If it is a `str`,
+    then it is a canonical unit name. If it is a tuple, then the first element
+    is a canonical prefix and the second element is a canonical unit name.
+    """
 
 
 @dataclass
