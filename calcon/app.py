@@ -1,4 +1,4 @@
-"""Module containing the App and Quantity class."""
+"""Module containing the App and Quantity classes."""
 
 
 from dataclasses import dataclass
@@ -20,9 +20,12 @@ class Quantity:
     """Dictionary mapping single units (components) to the power they are
     raised to.
 
-    Each key can either be a `str` or a tuple of two `str's`. If it is a `str`,
-    then it is a canonical unit name. If it is a tuple, then the first element
-    is a canonical prefix and the second element is a canonical unit name.
+    Each key can either be a `str` or a tuple of two `str`'s.
+
+    - If it is a `str`, then it is a canonical core unit name.
+    
+    - If it is a tuple, then the first element is a canonical prefix and the
+      second element is a canonical unit name.
     """
 
 
@@ -31,19 +34,29 @@ class _CoreUnitDefinition:
     """Defines a core unit (a non-prefixed unit)."""
 
     canonical: str
+    """Canonical name for this core unit."""
     root_value: Quantity
+    """Value of this unit in terms of root units."""
     symbol: Optional[str] = None
+    """Symbol used for this unit. If it is `None`, then there is no symbol
+    set for this unit."""
 
 
 @dataclass
 class _PrefixDefinition:
-    """Defines a unit prefix."""
+    """Defines a unit prefix.
+
+    Examples: kilo- (k-) stands for 1000.
+    """
 
     canonical: str
+    """Canonical name for this prefix unit."""
     value: Decimal
+    """Value of this prefix."""
 
 
 _ONE = Decimal(1)
+"""Decimal object for the number 1."""
 
 
 class App:
