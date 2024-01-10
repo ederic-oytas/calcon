@@ -59,8 +59,8 @@ class TestApp:
         assert "A" in display_str
         assert "b" in display_str
 
-    def test_define_methods_redefine_error(self) -> None:
-        """Tests that a `ValueError` is raised for the define methods when
+    def test_define_unit_methods_redefine_error(self) -> None:
+        """Tests that a `ValueError` is raised for the define unit methods when
         a unit is attempted to be redefined."""
         Q = Quantity
         D = Decimal
@@ -82,6 +82,36 @@ class TestApp:
                 app.define_unit_alias(unit, "d")
             with pytest.raises(ValueError):
                 app.define_unit_symbol_alias(unit, "d")
+
+    def test_define_prefix_methods_redefine_error(self) -> None:
+        """Tests the define prefix methods that they raise a `ValueError`
+        when we attempt to redefine a prefix."""
+
+        app = App()
+        app.define_canonical_prefix("a", Decimal(12))
+        app.define_prefix_alias("b", "a")
+        app.define_prefix_symbol_alias("c", "a")
+        app.define_canonical_prefix("d", Decimal(23))
+
+        # Test ValueError raised when name is already taken
+        for prefix in "abcd":
+            with pytest.raises(ValueError):
+                app.define_canonical_prefix(prefix, Decimal(21))
+            with pytest.raises(ValueError):
+                app.define_prefix_alias(prefix, "d")
+            with pytest.raises(ValueError):
+                app.define_prefix_symbol_alias(prefix, "d")
+
+    def test_define_prefix_symbol_alias__symbol_already_defined(self) -> None:
+        """Tests that App.define_prefix_symbol_alias() raises a `ValueError`
+        when the symbol is already defined for the prefix.
+        """
+        app = App()
+        app.define_canonical_prefix("a", Decimal(12))
+        app.define_prefix_symbol_alias("A1", "a")
+
+        with pytest.raises(ValueError):
+            app.define_prefix_symbol_alias("A2", "a")
 
     def test_quantity_from_magnitude_str(self) -> None:
         """Tests App.quantity_from_magnitude_str()"""

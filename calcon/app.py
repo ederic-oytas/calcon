@@ -43,6 +43,25 @@ class _UnitAliasDefinition(_UnitDefinition):
     canonical: str
 
 
+@dataclass
+class _PrefixDefinition:
+    """Defines a unit prefix."""
+
+
+@dataclass
+class _CanonicalPrefixDefinition(_PrefixDefinition):
+    """Defines a canonical prefix."""
+
+    value: Decimal
+
+
+@dataclass
+class _PrefixAliasDefinition(_PrefixDefinition):
+    """Defines a prefix alias."""
+
+    canonical: str
+
+
 class App:
     """Represents a Calcon app."""
 
@@ -51,6 +70,8 @@ class App:
         self._unit_definitions: dict[str, _UnitDefinition] = {}
         self._dimensions_to_units: dict[str, str] = {}
         self._units_to_symbols: dict[str, str] = {}
+        self._prefix_definitions: dict[str, _PrefixDefinition] = {}
+        self._prefixes_to_symbols: dict[str, str] = {}
 
     #
     # Definitions
@@ -112,6 +133,41 @@ class App:
                 f"Unit {canonical} already has a symbol defined for it."
             )
         self._units_to_symbols[canonical] = symbol
+
+    def define_canonical_prefix(self, prefix: str, value: Decimal, /) -> None:
+        """Defines a canonical unit prefix.
+
+        Raises `ValueError` if a prefix is already defined.
+        """
+        if prefix in self._prefix_definitions:
+            raise ValueError(f"Prefix {prefix} is already defined.")
+        self._prefix_definitions[prefix] = _CanonicalPrefixDefinition(
+            value=value
+        )
+
+    def define_prefix_alias(self, alias: str, canonical: str, /) -> None:
+        """Defines a prefix alias.
+
+        Raises `ValueError` if a prefix is already defined.
+        """
+        if alias in self._prefix_definitions:
+            raise ValueError(f"Prefix {alias} is already defined.")
+        self._prefix_definitions[alias] = _PrefixAliasDefinition(
+            canonical=canonical
+        )
+
+    def define_prefix_symbol_alias(self, symbol: str, canonical: str) -> None:
+        """Defines a prefix alias.
+
+        Raises `ValueError` if a prefix is already defined or if a symbol has
+        already been defined for the given prefix.
+        """
+        self.define_prefix_alias(symbol, canonical)
+        if canonical in self._prefixes_to_symbols:
+            raise ValueError(
+                f"A symbol has already been defined for the prefix {canonical}"
+            )
+        self._prefixes_to_symbols[canonical] = symbol
 
     #
     # Unit operations
