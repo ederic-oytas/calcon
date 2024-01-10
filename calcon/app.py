@@ -3,6 +3,10 @@
 
 from dataclasses import dataclass
 from decimal import Decimal
+from typing import Union
+
+
+_Unit = dict[str, Decimal]
 
 
 @dataclass
@@ -10,7 +14,7 @@ class Quantity:
     """Represents a physical quantity."""
 
     magnitude: Decimal
-    unit: dict[str, Decimal]
+    unit: _Unit
 
 
 @dataclass
@@ -113,7 +117,7 @@ class App:
     # Unit operations
     #
 
-    def _unit_lookup(self, unit_name: str, /) -> dict[str, Decimal]:
+    def _unit_lookup(self, unit_name: str, /) -> _Unit:
         """Looks up a unit by its name and returns it.
 
         Raises `ValueError` if the unit doesn't exist.
@@ -132,8 +136,8 @@ class App:
 
     def _unit_multiply_power_in_place(
         self,
-        multiplicand: dict[str, Decimal],
-        multiplier: dict[str, Decimal],
+        multiplicand: _Unit,
+        multiplier: _Unit,
         exponent: Decimal,
         /,
     ) -> None:
@@ -146,10 +150,10 @@ class App:
             else:
                 multiplicand.pop(component, None)
 
-    def _unit_root_value(self, unit: dict[str, Decimal], /) -> Quantity:
+    def _unit_root_value(self, unit: _Unit, /) -> Quantity:
         """Returns the root value of the given unit."""
         root_magnitude = Decimal(1)
-        root_unit: dict[str, Decimal] = {}
+        root_unit: _Unit = {}
         for component, power in unit.items():
             definition = self._unit_definitions[component]
 
@@ -188,7 +192,7 @@ class App:
         return Quantity(Decimal(1), self._unit_lookup(unit_name))
 
     def quantity_convert(
-        self, quantity: Quantity, target_unit: dict[str, Decimal], /
+        self, quantity: Quantity, target_unit: _Unit, /
     ) -> Quantity:
         """Converts the first quantity to the same units as the second quantity
         and returns the result.
@@ -259,7 +263,7 @@ class App:
         if y_root_magnitude == 0:
             return Quantity(Decimal(1), {})
 
-        result_unit: dict[str, Decimal] = {}
+        result_unit: _Unit = {}
         self._unit_multiply_power_in_place(
             result_unit, x.unit, y_root_magnitude
         )
