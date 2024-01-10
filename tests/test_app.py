@@ -45,10 +45,10 @@ class TestApp:
         symbol is already defined for a unit."""
         app = App()
         app.define_root_unit("a", "length")
-        app.define_unit_symbol_alias("A1", "a")
+        app.define_core_unit_symbol_alias("A1", "a")
 
         with pytest.raises(ValueError):
-            app.define_unit_symbol_alias("A2", "a")
+            app.define_core_unit_symbol_alias("A2", "a")
 
     def test_quantity_display_str_shows_symbol(self) -> None:
         """Tests that App.quantity_display_str() displays the symbols for the
@@ -56,7 +56,7 @@ class TestApp:
 
         app = App()
         app.define_root_unit("a", "length")
-        app.define_unit_symbol_alias("A", "a")
+        app.define_core_unit_symbol_alias("A", "a")
         app.define_root_unit("b", "time")
 
         quantity = q(12, a=1, b=1)
@@ -74,9 +74,9 @@ class TestApp:
         app = App()
         app.define_root_unit("a", "length")
         app.define_derived_core_unit("b", Q(D(2), {"a": D(1)}))
-        app.define_unit_alias("c", "b")
+        app.define_core_unit_alias("c", "b")
         app.define_root_unit("d", "time")
-        app.define_unit_symbol_alias("D", "d")
+        app.define_core_unit_symbol_alias("D", "d")
 
         # Test ValueError raised when name is already taken
         for unit in "abcdD":
@@ -85,9 +85,9 @@ class TestApp:
             with pytest.raises(ValueError):
                 app.define_derived_core_unit(unit, Q(D(3), {}))
             with pytest.raises(ValueError):
-                app.define_unit_alias(unit, "d")
+                app.define_core_unit_alias(unit, "d")
             with pytest.raises(ValueError):
-                app.define_unit_symbol_alias(unit, "d")
+                app.define_core_unit_symbol_alias(unit, "d")
 
     def test_define_prefix_methods_redefine_error(self) -> None:
         """Tests the define prefix methods that they raise a `ValueError`
@@ -107,6 +107,14 @@ class TestApp:
                 app.define_prefix_alias(prefix, "d")
             with pytest.raises(ValueError):
                 app.define_prefix_symbol_alias(prefix, "d")
+
+    def test_define_chained_aliases(self) -> None:
+        """Test that chained aliases work properly"""
+        app = App()
+        app.define_root_unit("a", "Length")
+        app.define_core_unit_alias("b", "a")
+        app.define_core_unit_alias("c", "b")
+        assert app.quantity_from_unit_name("c") == q(1, a=1)
 
     def test_define_prefix_symbol_alias__symbol_already_defined(self) -> None:
         """Tests that App.define_prefix_symbol_alias() raises a `ValueError`
@@ -142,7 +150,7 @@ class TestApp:
         app.define_derived_core_unit(
             "yard", Quantity(Decimal("0.9144"), {"meter": Decimal(1)})
         )
-        app.define_unit_alias("yard_alias", "yard")
+        app.define_core_unit_alias("yard_alias", "yard")
 
         assert f("meter") == Quantity(Decimal(1), {"meter": Decimal(1)})
         assert (

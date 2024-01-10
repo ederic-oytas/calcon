@@ -114,28 +114,30 @@ class App:
             )
         )
 
-    def define_unit_alias(self, alias: str, canonical: str, /) -> None:
-        """Defines an alias.
+    def define_core_unit_alias(self, alias: str, unit: str, /) -> None:
+        """Defines an alias for another unit.
 
         Raises `ValueError` if `alias` is already defined.
         """
         if alias in self._core_definitions:
             raise ValueError(f"Unit {alias} is already defined.")
-        canon_defn = self._core_definitions[canonical]
+        if unit not in self._core_definitions:
+            raise ValueError(f"Unit {unit} is not defined.")
+        canon_defn = self._core_definitions[unit]
         self._core_definitions[alias] = canon_defn
 
-    def define_unit_symbol_alias(self, symbol: str, canonical: str, /) -> None:
+    def define_core_unit_symbol_alias(self, symbol: str, unit: str, /) -> None:
         """Defines a symbol alias for a unit.
 
         Raises `ValueError` if the symbol alias is already an alias for a unit,
-        or if the canonical unit already has a symbol defined for it.
+        or if the unit already has a symbol defined for it.
         """
-        defn = self._core_definitions[canonical]
+        defn = self._core_definitions[unit]
         if defn.symbol is not None:
             raise ValueError(
-                f"Unit {canonical} already has a symbol defined for it."
+                f"Unit {unit} already has a symbol defined for it."
             )
-        self.define_unit_alias(symbol, canonical)
+        self.define_core_unit_alias(symbol, unit)
         defn.symbol = symbol
 
     def define_canonical_prefix(self, prefix: str, value: Decimal, /) -> None:

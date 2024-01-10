@@ -31,9 +31,9 @@ class DefineRootSymbolAliases(Statement):
     def execute(self, app: App, /) -> None:
         app.define_root_unit(self.unit, self.dimension)
         if self.symbol_alias is not None:
-            app.define_unit_symbol_alias(self.symbol_alias, self.unit)
+            app.define_core_unit_symbol_alias(self.symbol_alias, self.unit)
         for alias in self.aliases:
-            app.define_unit_alias(alias, self.unit)
+            app.define_core_unit_alias(alias, self.unit)
 
 
 @dataclass
@@ -49,6 +49,6 @@ class DefineDerivedSymbolAliases(Statement):
     def execute(self, app: App, /) -> None:
         app.define_derived_core_unit(self.unit, self.value.evaluate(app))
         if self.symbol is not None:
-            app.define_unit_alias(self.symbol, self.unit)
+            app.define_core_unit_alias(self.symbol, self.unit)
         for alias in self.aliases:
-            app.define_unit_alias(alias, self.unit)
+            app.define_core_unit_alias(alias, self.unit)
