@@ -156,6 +156,25 @@ class TestApp:
         with pytest.raises(ValueError):
             app.define_prefix_symbol_alias("A2", "a")
 
+    def test_define_canonical_prefix__value_not_dimensionless(self) -> None:
+        """Tests that App.define_canonical_prefix() raises a ValueError when
+        the prefix value is not dimensionless."""
+
+        app = App()
+        app.define_root_unit("meter", "Length")
+        app.define_derived_core_unit("pi", q("3.14159"))
+        app.define_canonical_prefix("kilo", q(1000))
+        app.define_canonical_prefix("pi_times_", q(1, pi=1))
+
+        with pytest.raises(ValueError):
+            app.define_canonical_prefix("meter_times_", q(1, meter=1))
+        with pytest.raises(ValueError):
+            app.define_canonical_prefix("cube_meter_times_", q(1, meter=3))
+        with pytest.raises(ValueError):
+            app.define_canonical_prefix(
+                "kilometer_times_", q(1, {("kilo", "meter"): 1})
+            )
+
     def test_quantity_from_magnitude_str(self) -> None:
         """Tests App.quantity_from_magnitude_str()"""
         app = App()
