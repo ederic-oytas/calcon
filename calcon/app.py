@@ -147,7 +147,7 @@ class App:
             raise ValueError(f"Prefix {prefix} is already defined.")
         value_in_root_units = self.quantity_convert_to_root_units(value)
         if value_in_root_units.unit:
-            raise ValueError(f"Prefix value is not dimensionless.")
+            raise ValueError("Prefix value is not dimensionless.")
         self._prefix_definitions[prefix] = _PrefixDefinition(
             canonical=prefix,
             value=value_in_root_units.magnitude,

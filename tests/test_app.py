@@ -536,8 +536,6 @@ class TestApp:
         app.define_canonical_prefix("kilo", q(1000))
         app.define_canonical_prefix("milli", q("0.001"))
 
-        f = app.quantity_convert
-
         equivalent = [
             q(12, {("kilo", "meter"): 1}),
             q(12_000, {"meter": 1}),
