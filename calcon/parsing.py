@@ -106,7 +106,7 @@ class _Transformer(lark.Transformer):
 
         return DefineDerivedSymbolAliases(
             unit=unit,
-            symbol=symbol,
+            symbol_alias=symbol,
             aliases=aliases,
             value=value,
         )

@@ -42,14 +42,14 @@ class DefineDerivedSymbolAliases(Statement):
     and its aliases."""
 
     unit: str
-    symbol: Optional[str]
+    symbol_alias: Optional[str]
     aliases: list[str]
     value: Expression
 
     def execute(self, app: App, /) -> None:
         app.define_derived_core_unit(self.unit, self.value.evaluate(app))
-        if self.symbol is not None:
-            app.define_core_unit_alias(self.symbol, self.unit)
+        if self.symbol_alias is not None:
+            app.define_core_unit_symbol_alias(self.symbol_alias, self.unit)
         for alias in self.aliases:
             app.define_core_unit_alias(alias, self.unit)
 
