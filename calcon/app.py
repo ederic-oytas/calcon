@@ -138,16 +138,19 @@ class App:
         self.define_core_unit_alias(symbol, unit)
         defn.symbol = symbol
 
-    def define_canonical_prefix(self, prefix: str, value: Decimal, /) -> None:
+    def define_canonical_prefix(self, prefix: str, value: Quantity, /) -> None:
         """Defines a canonical unit prefix.
 
         Raises `ValueError` if a prefix is already defined.
         """
         if prefix in self._prefix_definitions:
             raise ValueError(f"Prefix {prefix} is already defined.")
+        value_in_root_units = self.quantity_convert_to_root_units(value)
+        if value_in_root_units.unit:
+            raise ValueError(f"Prefix value is not dimensionless.")
         self._prefix_definitions[prefix] = _PrefixDefinition(
             canonical=prefix,
-            value=value,
+            value=value_in_root_units.magnitude,
         )
 
     def define_prefix_alias(self, alias: str, canonical: str, /) -> None:

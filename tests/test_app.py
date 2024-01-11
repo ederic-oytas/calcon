@@ -123,15 +123,15 @@ class TestApp:
         when we attempt to redefine a prefix."""
 
         app = App()
-        app.define_canonical_prefix("a", Decimal(12))
+        app.define_canonical_prefix("a", q(12))
         app.define_prefix_alias("b", "a")
         app.define_prefix_symbol_alias("c", "a")
-        app.define_canonical_prefix("d", Decimal(23))
+        app.define_canonical_prefix("d", q(23))
 
         # Test ValueError raised when name is already taken
         for prefix in "abcd":
             with pytest.raises(ValueError):
-                app.define_canonical_prefix(prefix, Decimal(21))
+                app.define_canonical_prefix(prefix, q(21))
             with pytest.raises(ValueError):
                 app.define_prefix_alias(prefix, "d")
             with pytest.raises(ValueError):
@@ -150,7 +150,7 @@ class TestApp:
         when the symbol is already defined for the prefix.
         """
         app = App()
-        app.define_canonical_prefix("a", Decimal(12))
+        app.define_canonical_prefix("a", q(12))
         app.define_prefix_symbol_alias("A1", "a")
 
         with pytest.raises(ValueError):
@@ -199,7 +199,7 @@ class TestApp:
         app.define_root_unit("meter", "Length")
         app.define_core_unit_symbol_alias("m", "meter")
         app.define_core_unit_alias("metre", "meter")
-        app.define_canonical_prefix("kilo", Decimal(1000))
+        app.define_canonical_prefix("kilo", q(1000))
         app.define_prefix_symbol_alias("k", "kilo")
         app.define_prefix_alias("K", "k")
 
@@ -221,16 +221,16 @@ class TestApp:
         f = app.quantity_from_unit_name
 
         app.define_root_unit("a", "A")
-        app.define_canonical_prefix("aaaaaa", Decimal(1))
+        app.define_canonical_prefix("aaaaaa", q(1))
         assert f("aaaaaaa") == q(1, {("aaaaaa", "a"): 1})
 
         # A unit with a smaller prefix shadows a unit with a larger prefix
         app.define_root_unit("aa", "AA")
-        app.define_canonical_prefix("aaaaa", Decimal(1))
+        app.define_canonical_prefix("aaaaa", q(1))
         assert f("aaaaaaa") == q(1, {("aaaaa", "aa"): 1})
 
         app.define_root_unit("aaa", "AAA")
-        app.define_canonical_prefix("aaaa", Decimal(1))
+        app.define_canonical_prefix("aaaa", q(1))
         assert f("aaaaaaa") == q(1, {("aaaa", "aaa"): 1})
 
         # A unit with no prefix shadows any unit with a prefix
@@ -245,7 +245,7 @@ class TestApp:
         app.define_root_unit("meter", "Length")
         app.define_core_unit_alias("metre", "meter")
         app.define_core_unit_symbol_alias("m", "meter")
-        app.define_canonical_prefix("milli", Decimal("0.001"))
+        app.define_canonical_prefix("milli", q("0.001"))
         app.define_prefix_symbol_alias("m", "milli")
 
         one_meter = q(1, meter=1)
@@ -514,8 +514,8 @@ class TestApp:
     def test_quantity_convert_with_prefixes(self) -> None:
         app = App()
         app.define_root_unit("meter", "Length")
-        app.define_canonical_prefix("kilo", Decimal(1000))
-        app.define_canonical_prefix("milli", Decimal("0.001"))
+        app.define_canonical_prefix("kilo", q(1000))
+        app.define_canonical_prefix("milli", q("0.001"))
 
         f = app.quantity_convert
 
@@ -543,21 +543,21 @@ class TestApp:
 
         app0 = App()
         app0.define_root_unit("meter", "Length")
-        app0.define_canonical_prefix("kilo", Decimal(1000))
+        app0.define_canonical_prefix("kilo", q(1000))
 
         app1 = App()
         app1.define_root_unit("meter", "Length")
-        app1.define_canonical_prefix("kilo", Decimal(1000))
+        app1.define_canonical_prefix("kilo", q(1000))
         app1.define_core_unit_symbol_alias("m", "meter")
 
         app2 = App()
         app2.define_root_unit("meter", "Length")
-        app2.define_canonical_prefix("kilo", Decimal(1000))
+        app2.define_canonical_prefix("kilo", q(1000))
         app2.define_prefix_symbol_alias("k", "kilo")
 
         app3 = App()
         app3.define_root_unit("meter", "Length")
-        app3.define_canonical_prefix("kilo", Decimal(1000))
+        app3.define_canonical_prefix("kilo", q(1000))
         app3.define_core_unit_symbol_alias("m", "meter")
         app3.define_prefix_symbol_alias("k", "kilo")
 
