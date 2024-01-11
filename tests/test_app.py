@@ -214,6 +214,29 @@ class TestApp:
         assert f("Km") == x
         assert f("Kmetre") == x
 
+    def test_quantity_from_unit_name_with_prefixes__shadowing(self) -> None:
+        """Tests shadowing for units."""
+
+        app = App()
+        f = app.quantity_from_unit_name
+
+        app.define_root_unit("a", "A")
+        app.define_canonical_prefix("aaaaaa", Decimal(1))
+        assert f("aaaaaaa") == q(1, {("aaaaaa", "a"): 1})
+
+        # A unit with a smaller prefix shadows a unit with a larger prefix
+        app.define_root_unit("aa", "AA")
+        app.define_canonical_prefix("aaaaa", Decimal(1))
+        assert f("aaaaaaa") == q(1, {("aaaaa", "aa"): 1})
+
+        app.define_root_unit("aaa", "AAA")
+        app.define_canonical_prefix("aaaa", Decimal(1))
+        assert f("aaaaaaa") == q(1, {("aaaa", "aaa"): 1})
+
+        # A unit with no prefix shadows any unit with a prefix
+        app.define_root_unit("aaaaaaa", "AAAAAAA")
+        assert f("aaaaaaa") == q(1, {"aaaaaaa": 1})
+
     def test_quantity_convert_to_root_units(self) -> None:
         app = App()
         app.define_root_unit("i", "Length")
