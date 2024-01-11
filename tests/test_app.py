@@ -237,6 +237,45 @@ class TestApp:
         app.define_root_unit("aaaaaaa", "AAAAAAA")
         assert f("aaaaaaa") == q(1, {"aaaaaaa": 1})
 
+    def test_quantity_from_unit_name_with_s_suffix(self) -> None:
+        """Tests quantity_from_unit_name() with -s suffix."""
+
+        app = App()
+        f = app.quantity_from_unit_name
+        app.define_root_unit("meter", "Length")
+        app.define_core_unit_alias("metre", "meter")
+        app.define_core_unit_symbol_alias("m", "meter")
+        app.define_canonical_prefix("milli", Decimal("0.001"))
+        app.define_prefix_symbol_alias("m", "milli")
+
+        one_meter = q(1, meter=1)
+        one_millimeter = q(1, {("milli", "meter"): 1})
+
+        assert f("meters") == one_meter
+        assert f("metres") == one_meter
+        assert f("ms") == one_meter
+        assert f("millimeters") == one_millimeter
+        assert f("millimetres") == one_millimeter
+        assert f("millims") == one_millimeter
+        assert f("mmeters") == one_millimeter
+        assert f("mmetres") == one_millimeter
+        assert f("mms") == one_millimeter
+
+        app.define_root_unit("second", "Time")
+        app.define_core_unit_symbol_alias("s", "second")
+
+        # millisecond (ms) shadows meter symbol + 's'
+        assert f("ms") == q(1, {("milli", "second"): 1})
+
+        # ss represents seconds
+        assert f("ss") == q(1, {"second": 1})
+
+        # Test that multiple -s don't work
+        with pytest.raises(ValueError):
+            f("metersssssss")
+        with pytest.raises(ValueError):
+            f("meterss")
+
     def test_quantity_convert_to_root_units(self) -> None:
         app = App()
         app.define_root_unit("i", "Length")

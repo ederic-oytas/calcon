@@ -180,7 +180,7 @@ class App:
     # Unit operations
     #
 
-    def _unit_lookup(self, unit: str, /) -> _Unit:
+    def _unit_lookup(self, unit: str, /, *, _removed_s: bool = False) -> _Unit:
         """Looks up a unit by its name and returns it.
 
         Raises `ValueError` if the unit doesn't exist.
@@ -201,6 +201,11 @@ class App:
                 prefix_canon = prefix_defn.canonical
                 core_canon = core_defn.canonical
                 return {(prefix_canon, core_canon): Decimal(1)}
+
+        # Otherwise, if the unit ends with -s and we haven't removed it yet,
+        # try it again without the -s
+        if not _removed_s and unit.endswith("s"):
+            return self._unit_lookup(unit[:-1], _removed_s=True)
 
         # If that all fails, then raise an error.
         raise ValueError(f"Unknown unit {unit!r}") from None
