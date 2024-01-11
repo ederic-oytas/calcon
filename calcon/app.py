@@ -243,7 +243,7 @@ class App:
 
             core_defn = self._core_definitions[core]
             root_magnitude *= prefix_value**power
-            root_magnitude *= core_defn.root_value.magnitude
+            root_magnitude *= core_defn.root_value.magnitude**power
             self._unit_multiply_power_in_place(
                 root_unit, core_defn.root_value.unit, power
             )

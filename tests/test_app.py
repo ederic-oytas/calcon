@@ -350,6 +350,18 @@ class TestApp:
             for b in equivalent:
                 assert app.quantity_convert(a, b.unit) == b
 
+    def test_quantity_convert__frequency(self) -> None:
+        app = App()
+        app.define_root_unit("second", "time")
+        app.define_derived_core_unit("minute", q(60, second=1))
+        app.define_derived_core_unit("hour", q(60, minute=1))
+        app.define_derived_core_unit("day", q(24, hour=1))
+        app.define_derived_core_unit("year", q(365, day=1))
+        f = app.quantity_convert
+
+        assert f(q(3600, hour=-1), u(second=-1)) == q(1, second=-1)
+        assert f(q(365, year=-1), u(day=-1)) == q(1, day=-1)
+
     def test_quantity_convert__different_dimensions(self) -> None:
         app = App()
         app.define_root_unit("second", "time")
