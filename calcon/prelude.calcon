@@ -27,6 +27,44 @@
 1 candela (cd)      :: Luminosity
 
 #
+# Prefixes
+# --------
+#
+# These definitions define the prefixes for the unit system. Prefixes may be
+# prepended to a non-prefixed unit to multiply its value.
+#
+# Syntax:
+#
+#     PREFIX - = (SYMBOL_ALIAS-) [ALIASES-...] = VALUE
+#
+# As shown, each identifier in the left side of the expression must be appended
+# with a hyphen (-). (SYMBOL_ALIAS-) and [ALIASES-...] are both optional.
+# ALIASES must contain at least one prefix when specified.
+#
+
+yotta- (Y-) = 1e24
+zetta- (Z-) = 1e21
+exa- (E-)   = 1e18
+peta- (P-)  = 1e15
+tera- (T-)  = 1e12
+giga- (G-)  = 1e9
+mega- (M-)  = 1e6
+kilo- (k-)  = 1e3
+hecto- (h-) = 1e2
+deka- (da-) = 1e1
+
+deci- (d-)       = 1e-1
+centi- (c-)      = 1e-2
+milli- (m-)      = 1e-3
+micro- (μ-) [u-] = 1e-6
+nano- (n-)       = 1e-9
+pico- (p-)       = 1e-12
+femto- (f-)      = 1e-15
+atto- (a-)       = 1e-18
+zepto- (z-)      = 1e-21
+yocto- (y-)      = 1e-24
+
+#
 # Derived Units
 # -------------
 #
@@ -42,9 +80,6 @@
 
 # Pi up to 100 digits
 1 pi = 3.1415926535_8979323846_2643383279_5028841971_6939937510_5820974944_5923078164_0628620899_8628034825_3421170679
-
-# prefixes to be implemented later
-1 kilogram (kg) [kilogramme] = 1000 gram
 
 1 radian (rad)    = 1
 1 steradian (sr)  = 1

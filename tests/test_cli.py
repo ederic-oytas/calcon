@@ -6,7 +6,7 @@
 
 from decimal import Decimal
 from functools import cache
-from typing import Union
+from typing import Optional, Union
 from typer.testing import CliRunner
 
 import pytest
@@ -14,17 +14,33 @@ import calcon.main
 from calcon.app import Quantity
 from calcon.parsing import parse_expr
 
+_Unit = dict[Union[str, tuple[str, str]], Decimal]
 
-def q(magnitude: Union[int, str], /, **unit: Union[int, str]) -> Quantity:
+
+def q(
+    magnitude: Union[int, str],
+    unit1: Optional[dict[Union[str, tuple[str, str]], Union[int, str]]] = None,
+    /,
+    **unit2: Union[int, str],
+) -> Quantity:
     """Helper function to create a quantity, automatically converting the
     integers/strings to Decimal objects."""
+    if unit1 is None:
+        unit1 = {}
+    unit = unit1 | unit2
     return Quantity(
         Decimal(magnitude),
         {c: Decimal(p) for c, p in unit.items()},
     )
 
 
-def u(**unit: Union[int, str]) -> dict[str, Decimal]:
+def u(
+    unit1: Optional[dict[Union[str, tuple[str, str]], Union[int, str]]] = None,
+    **unit2: Union[int, str],
+) -> _Unit:
+    if unit1 is None:
+        unit1 = {}
+    unit = unit1 | unit2
     return {c: Decimal(p) for c, p in unit.items()}
 
 
@@ -49,7 +65,7 @@ def cache_default_app_if_fast(
 @pytest.mark.parametrize(
     "input_expr,expected_quantity",
     [
-        ("1000 * gram -> kilogram", q(1, kilogram=1)),
+        ("1000 * gram -> kilogram", q(1, {("kilo", "gram"): 1})),
         ("(3 * meter) * (4 * meter)", q(12, meter=2)),
         ("2 3 4", q(24)),
         ("3 meter * 4 meter", q(12, meter=2)),
@@ -73,6 +89,11 @@ def cache_default_app_if_fast(
         ("12 J / 3 m -> N", q(4, newton=1)),
         ("12 ohm * 3 A -> V", q(36, volt=1)),
         ("86400s -> d", q(1, day=1)),
+        ("1Ym -> ym", q("1e48", {("yocto", "meter"): 1})),
+        ("1h -> s", q(3600, second=1)),
+        ("3600/h -> 1/s", q(1, second=-1)),
+        ("12dm^3 -> L", q(12, liter=1)),
+        ("12/dm^3 -> 1/L", q(12, liter=-1)),
     ],
 )
 def test_successes(
