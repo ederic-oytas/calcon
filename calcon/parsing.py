@@ -18,6 +18,7 @@ from calcon.expressions import (
 )
 from calcon.statements import (
     DefineDerivedSymbolAliases,
+    DefinePrefixSymbolAliases,
     DefineRootSymbolAliases,
     Statement,
 )
@@ -106,6 +107,32 @@ class _Transformer(lark.Transformer):
         return DefineDerivedSymbolAliases(
             unit=unit,
             symbol=symbol,
+            aliases=aliases,
+            value=value,
+        )
+
+    def define_prefix_symbol_aliases(
+        self,
+        prefix: str,
+        symbol: Optional[str],
+        *rest: Any,
+    ) -> Statement:
+        # converts lark.Token into strings
+        prefix = str(prefix)
+        if symbol is not None:
+            symbol = str(symbol)
+
+        aliases: list[str]
+        value: Expression
+        *aliases, value = rest
+        assert all(isinstance(alias, lark.Token) for alias in aliases)
+        for i, alias in enumerate(aliases):
+            aliases[i] = str(alias)
+        assert isinstance(value, Expression)
+
+        return DefinePrefixSymbolAliases(
+            prefix=prefix,
+            symbol_alias=symbol,
             aliases=aliases,
             value=value,
         )

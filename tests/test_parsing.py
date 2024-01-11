@@ -71,6 +71,19 @@ def test_statements() -> None:
     with pytest.raises(lark.LarkError):
         parse_statements("1 one_unit (1u) = unit")
 
+    # Test define prefix statements
+    texts = [
+        "micro- = 1e-6",
+        "micro- (μ-) = 1e-6",
+        "micro- [u-] = 1e-6",
+        "micro- (μ-) [u-] = 1e-6",
+        "micro- (μ-) [u-, mic-] = 1e-6",
+    ]
+    for text in texts:
+        statements = parse_statements(text)
+        assert len(statements) == 1
+        assert isinstance(statements[0], Statement)
+
 
 def test_expr() -> None:
     assert isinstance(parse_expr("5"), Expression)

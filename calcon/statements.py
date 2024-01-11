@@ -52,3 +52,26 @@ class DefineDerivedSymbolAliases(Statement):
             app.define_core_unit_alias(self.symbol, self.unit)
         for alias in self.aliases:
             app.define_core_unit_alias(alias, self.unit)
+
+
+@dataclass
+class DefinePrefixSymbolAliases(Statement):
+    """Represents a statement which defines a prefix, its symbol, and its
+    aliases."""
+
+    prefix: str
+    symbol_alias: Optional[str]
+    aliases: list[str]
+    value: Expression
+
+    def execute(self, app: App, /) -> None:
+        value_in_root_units = app.quantity_convert_to_root_units(
+            self.value.evaluate(app)
+        )
+        if value_in_root_units.unit:  # if not unitless
+            raise RuntimeError("Value is not dimensionless.")
+        app.define_canonical_prefix(self.prefix, value_in_root_units.magnitude)
+        if self.symbol_alias is not None:
+            app.define_prefix_symbol_alias(self.symbol_alias, self.prefix)
+        for alias in self.aliases:
+            app.define_prefix_alias(alias, self.prefix)
