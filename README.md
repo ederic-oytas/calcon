@@ -45,3 +45,13 @@ be supported in the future.
 - Added comments (Python-style) (e.g. `5 meters  # this is a comment`)
 
 - Added more units
+
+### 0.3.0
+
+- Added unit prefixes (e.g. `kilo-`, `centi-`)
+
+- Units can be appended with -s (e.g. `meters`, `liters`)
+
+- Results now display as their unit symbols
+
+- Bug fixes
